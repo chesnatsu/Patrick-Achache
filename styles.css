@@ -50,10 +50,8 @@
     .nav-wrap {
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 2000;   
       background: rgba(255, 255, 255, 0.86);
-      backdrop-filter: saturate(140%) blur(8px);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     }
 
     .nav-bar {
@@ -361,15 +359,20 @@
   display: block;
 }
 
-
 /* ABOUT ME OVERLAY */
+.charity-all-overlay,
+.assoc-all-overlay,
+.sa-overlay,
+.assoc-overlay,
 .aboutme-overlay {
   position: fixed;
-  inset: 0;
-  background: #f8f8f8;
+  left: 0;
+  right: 0;
+  bottom: 0;
+   padding-top: calc(var(--navbar-height) + 20px);
+  background: #000;   /* bg handled by image */
   overflow-y: auto;
-  z-index: 100;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;   
 
   opacity: 0;
   transform: translateY(100%);
@@ -378,20 +381,29 @@
               transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.aboutme-overlay.is-visible {
+.aboutme-overlay.is-visible,
+.charity-all-overlay.is-visible,
+.assoc-all-overlay.is-visible,
+.sa-overlay.is-visible,
+.assoc-overlay.is-visible {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
 }
-/* Background image for overlay */
-.aboutme-bg {
+
+/* shared full-screen background image for overlays */
+.aboutme-bg,
+.charity-all-overlay .bg,
+.assoc-all-overlay .bg,
+.sa-overlay .bg,
+.assoc-overlay .bg {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   z-index: -1;
-  filter: brightness(0.55); /* same darkening as your screenshot */
+  
 }
 
 .aboutme-inner {
@@ -400,16 +412,21 @@
   border-radius: 24px 24px 0 0;
   max-width: 1200px;
   width: 100%;
-  /* Fills the whole screen height minus header offset */
-  height: calc(100vh - 120px);
+
+  /* key part: card is at least the full height of the visible area
+     (window – navbar – top margin), and can grow taller */
+  margin: 40px auto 0;
+  min-height: calc(100vh - var(--navbar-height) - 40px);
+  height: auto;
+
   display: grid;
   grid-template-columns: 1fr 1.4fr;
   gap: 60px;
   align-items: stretch;
-  /* Center the card and remove gap at bottom */
-  margin: 120px auto 0;
+
   box-shadow: 0 18px 40px rgba(0,0,0,0.18);
 }
+
 
 
 /* Left portrait container */
@@ -449,34 +466,6 @@
 }
 
 
-/* Close button (reuse your style) */
-.close-btn {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  background: #a8957b;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 101;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-.close-btn:hover {
-  background: #b8a58c;
-  transform: scale(1.1);
-}
-.close-btn:active {
-  transform: scale(0.95);
-}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -517,13 +506,7 @@
     font: normal normal normal 16px/20px Oxygen;
   }
 
-  .close-btn {
-    top: 10px;
-    right: 10px;
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
-  }
+
 }
 
 
@@ -558,7 +541,7 @@
     }
 
     .charity-title {
-      margin: 4px 0 10px;
+      margin: 0 0 -20px;
       font: normal normal normal 94px/192px var(--font-display);
       letter-spacing: 14.1px;
       color: #a39784;
@@ -566,7 +549,7 @@
 
     .charity-lede {
       margin: 0 auto clamp(28px, 6vh, 44px);
-      max-width: 900px;
+      max-width: 1400px;
       color: #e7e2da;
       line-height: 1.7;
       font-size: 16px;
@@ -630,36 +613,6 @@
       margin: 0 auto;
       color: #6d6b66;
     }
-    /* OVERLAY WRAPPER */
-    .charity-all-overlay {
-      position: fixed;
-      inset: 0;
-      background: #f8f8f8;
-      overflow-y: auto;
-      z-index: 100;
-      opacity: 0;
-      transform: translateY(100%);
-      pointer-events: none;
-      transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .charity-all-overlay.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    /* background inside overlay */
-    .charity-all-overlay .bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      z-index: -1;
-    }
 
     .charity-all-overlay .container {
       position: relative;
@@ -675,39 +628,6 @@
     }
 /* === SUPPORTED ASSOCIATIONS – ALL OVERLAY (Charity All style) === */
 
-    .assoc-all-overlay {
-      position: fixed;
-      inset: 0;
-      background: #f8f8f8;
-      overflow-y: auto;
-      z-index: 100;
-      /* hidden by default */
-      opacity: 0;
-      transform: translateY(100%);
-      pointer-events: none;
-      transition:
-        opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-        transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* show like Charity All when .is-visible is toggled */
-    .assoc-all-overlay.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    /* background image same as Charity All */
-    .assoc-all-overlay .bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      z-index: -1;
-    }
-
     .assoc-all-overlay .container {
       position: relative;
       z-index: 1;
@@ -721,7 +641,7 @@
       margin: 40px 0;
     }
 
-    /* white rounded stack like Charity All's .stack */
+    /* White rounded stack for Supported Associations */
     .assoc-stack {
       display: flex;
       flex-direction: column;
@@ -729,10 +649,27 @@
       background: #ffffff;
       border-radius: 20px 20px 0 0;
       padding: 40px;
-      margin: 0 auto 40px;
       max-width: 1200px;
+      height: calc(90vh - var(--navbar-height) - 80px); /* visible height minus navbar + margin */
+      overflow-y: auto; /* scroll vertically if content overflows */
+      overflow-x: hidden;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
+
+    /* Optional: smoother scrolling for nicer UX */
+    .assoc-stack::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .assoc-stack::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,0.2);
+      border-radius: 4px;
+    }
+
+    .assoc-stack::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+
 
     /* card layout: image left, text right */
     .assoc-card {
@@ -795,34 +732,7 @@
       cursor: pointer;
     }
 
-    /* reuse your circular close button style */
-    .close-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 50px;
-      height: 50px;
-      background: #a8957b;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 101;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-    .close-btn:hover {
-      background: #b8a58c;
-      transform: scale(1.1);
-    }
-    .close-btn:active {
-      transform: scale(0.95);
-    }
+    
 
     @media (max-width: 900px) {
       .assoc-card {
@@ -836,8 +746,11 @@
       background: #ffffff;
       border-radius: 20px 20px 0 0;
       padding: 40px;
-      margin: 0 auto 40px;
+      margin: 40px auto 0;
       max-width: 1200px;
+      min-height: calc(100vh - var(--navbar-height) - 40px);
+      height: auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
     /* card */
@@ -1177,7 +1090,7 @@
 
       .companies-lede p {
         position: relative;
-        margin: 0 0 1em 1;
+        margin: 0 0 -20px;
         font-family: var(--font-body, "Oxygen", system-ui, sans-serif);
         font-size: 14px;
         line-height: 1.7;
@@ -1286,34 +1199,6 @@
         transform: translate(calc(-50% + 450px), -50%);
       }
 
-      .assoc-overlay {
-        position: fixed;
-        inset: 0;
-        background: #f8f8f8;
-        overflow-y: auto;
-        z-index: 1000;
-
-        opacity: 0;
-        transform: translateY(100%);
-        pointer-events: none;
-        transition: opacity .8s cubic-bezier(0.4,0,0.2,1),
-                    transform .8s cubic-bezier(0.4,0,0.2,1);
-      }
-
-      .assoc-overlay.is-visible {
-        opacity: 1;
-        transform: translateY(0);
-        pointer-events: auto;
-      }
-
-      .assoc-overlay .bg {
-        position: fixed;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        z-index: -1;
-      }
 
       /* white card layout */
       .assoc-card-stack {
@@ -1355,34 +1240,6 @@
       }
       /* SUPPORTED ASSOCIATIONS – INDIVIDUAL OVERLAYS */
 
-      .sa-overlay {
-        position: fixed;
-        inset: 0;
-        background: #f8f8f8;
-        overflow-y: auto;
-        z-index: 1200;
-        opacity: 0;
-        transform: translateY(100%);
-        pointer-events: none;
-        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-                    transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .sa-overlay.is-visible {
-        opacity: 1;
-        transform: translateY(0);
-        pointer-events: auto;
-      }
-
-      .sa-overlay .bg {
-        position: fixed;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        z-index: -1;
-      }
-
       .sa-overlay .container {
         position: relative;
         z-index: 1;
@@ -1394,24 +1251,25 @@
         letter-spacing: 7.17px;
         color: #ffffff;
         margin: 40px 0;
+        
       }
 
-      /* white card */
+      /* White card */
       .sa-overlay-card {
         background: #ffffff;
         border-radius: 20px 20px 0 0;
         padding: 40px;
-        margin: 0 auto 60px;
+        margin: 40px auto 0;
         max-width: 1200px;
+        height: calc(90vh - var(--navbar-height) - 80px); /* visible height minus navbar + margin */
+        overflow: hidden; /* prevent overflow */
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      }
-
-      .sa-overlay-card {
         display: grid;
-        grid-template-rows: auto 1fr; /* First row for the image, second for text */
+        grid-template-rows: auto 1fr;
         gap: 16px;
       }
 
+      /* Image container */
       .sa-overlay-media {
         margin: 0;
         border-radius: 18px;
@@ -1419,15 +1277,19 @@
         background: #f5f5f5;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         grid-row: 1;
+        width: 100%;   /* fill horizontal space */
+        height: 400px; /* set desired height, can be relative like 50% if needed */   
       }
 
+      /* Make image cover the container properly */
       .sa-overlay-media img {
         display: block;
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        
+        object-fit: cover; /* fills container without distortion */
+        object-position: center; /* centers the image */
       }
+
 
       .sa-overlay-body {
         align-self: start;
@@ -1449,34 +1311,7 @@
         font-size: 14px;
       }
 
-      /* reuse your circular close button */
-      .close-btn {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        background: #a8957b;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        font-size: 24px;
-        font-weight: bold;
-        cursor: pointer;
-        z-index: 1300;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      }
-      .close-btn:hover {
-        background: #b8a58c;
-        transform: scale(1.05);
-      }
-      .close-btn:active {
-        transform: scale(0.95);
-      }
+     
 
       @media (max-width: 900px) {
         .sa-overlay-card {

@@ -152,4 +152,20 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+document.addEventListener('DOMContentLoaded', function () {
+  const navLinks = document.querySelectorAll('.nav-link, .nav-center');
 
+  const allOverlays = document.querySelectorAll(
+    '.aboutme-overlay, ' +
+    '.charity-all-overlay, ' +
+    '.assoc-all-overlay, ' +
+    '.sa-overlay, ' +
+    '.assoc-overlay'
+  );
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      allOverlays.forEach(ov => ov.classList.remove('is-visible'));
+    });
+  });
+});
