@@ -32,6 +32,7 @@
 
     html {
       scroll-behavior: smooth;
+      scroll-padding-top: var(--navbar-height);
     }
 
     .container {
@@ -95,19 +96,7 @@
       object-fit: contain;
     }
 
-    @media (max-width: 860px) {
-      .nav-bar {
-        grid-template-columns: auto auto auto;
-        padding-inline: 10px;
-      }
-      .nav-left,
-      .nav-right {
-        gap: 16px;
-      }
-      .nav-right a:nth-child(1) {
-        display: none; /* hide long label on mobile */
-      }
-    }
+  
 
     /* HERO -------------------------------------------------- */
 
@@ -130,7 +119,24 @@
       height: 100%;
       object-fit: cover;
       z-index: 0;
+
+      /* animation */
+      opacity: 0;
+      transform: translateX(-40px);
+      animation: heroBgSlide 1.2s ease-out forwards;
     }
+
+    @keyframes heroBgSlide {
+      0% {
+        opacity: 0;
+        transform: translateX(-40px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
 
     .hero-shade {
       position: absolute;
@@ -145,7 +151,6 @@
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      gap: clamp(20px, 6vw, 60px);
       width: 100%;
       max-width: 2000px;
       padding: 0 clamp(20px, 4vw, 80px) clamp(24px, 8vh, 60px);
@@ -166,15 +171,29 @@
       align-self: flex-end;
       color: #fff;
       text-align: left;
-      margin-bottom: 30vh;
-      animation: slide-left 1s ease-out forwards;
+      margin-bottom: 20%;
       opacity: 0;
+
+      /* NEW: slide from right */
+      transform: translateX(40px);
+      animation: heroTextSlide 1.2s ease-out forwards;
+      animation-delay: 0.35s; /* small delay for a nice stagger */
+    }
+
+    @keyframes heroTextSlide {
+      0% {
+        opacity: 0;
+        transform: translateX(40px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
 
     .hero-name {
-      margin: 0 0 14px;
       font-weight: 500;
-      font-size: clamp(72px, 9vw, 100px);
+      font: normal normal normal 110px/122px "Balerno Serif", serif;
       line-height: 1.1;
       letter-spacing: 0.02em;
     }
@@ -200,27 +219,7 @@
       }
     }
 
-    @media (max-width: 900px) {
-      .hero-content {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding-bottom: 5vh;
-      }
-
-      .hero-portrait {
-        order: 1;
-        width: min(80vw, 380px);
-        transform: translateY(0);
-        margin-left: 0;
-      }
-
-      .hero-text {
-        order: 2;
-        margin-bottom: 10vh;
-        text-align: center;
-      }
-    }
+   
 
 /* ABOUT VIEW (same look as your Vue version) */
 .about {
@@ -266,9 +265,8 @@
   gap: clamp(24px, 6vw, 60px);
   align-items: start;
   width: 100%;
+  margin-bottom: 15%;
   max-width: 2300px;
-  margin: 0 auto;
-  padding: 40px 20px;
   position: relative;
   z-index: 1;
 }
@@ -369,11 +367,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-   padding-top: calc(var(--navbar-height) + 20px);
+  padding-top: calc(var(--navbar-height) + 20px);
   background: #000;   /* bg handled by image */
   overflow-y: auto;
   z-index: 1000;   
-
   opacity: 0;
   transform: translateY(100%);
   pointer-events: none;
@@ -412,18 +409,13 @@
   border-radius: 24px 24px 0 0;
   max-width: 1200px;
   width: 100%;
-
-  /* key part: card is at least the full height of the visible area
-     (window – navbar – top margin), and can grow taller */
   margin: 40px auto 0;
   min-height: calc(100vh - var(--navbar-height) - 40px);
   height: auto;
-
   display: grid;
   grid-template-columns: 1fr 1.4fr;
   gap: 60px;
   align-items: stretch;
-
   box-shadow: 0 18px 40px rgba(0,0,0,0.18);
 }
 
@@ -481,18 +473,22 @@
     order: -1;
   }
 
-  .card--top,
-  .card--bottom {
+  .charity-card--top,
+  .charity-card--bottom,
+  .assoc-card--top,
+  .assoc-card--top {
     position: relative;
     width: 100%;
     margin-bottom: 20px;
   }
 
-  .card--top {
+  .charity-card-top,
+  .assoc-card-top {
     inset: unset;
   }
 
-  .card--bottom {
+  .charity-card--bottom
+  .assoc-chard--bottom {
     top: unset;
     left: unset;
   }
@@ -528,7 +524,7 @@
       inset: 0;
       background-image: url("images/Charity_bg.png"); /* update path */
       background-repeat: repeat;
-      background-size: 560px auto;
+      background-size: 580px auto;
       opacity: 0.75;
       filter: contrast(0.95) brightness(0.9);
     }
@@ -536,8 +532,9 @@
     .charity-content {
       position: relative;
       z-index: 1;
-      padding: clamp(32px, 6vh, 64px) 0 clamp(40px, 8vh, 96px);
       text-align: center;
+      margin-bottom: 10%;
+      top: -30px;
     }
 
     .charity-title {
@@ -614,12 +611,14 @@
       color: #6d6b66;
     }
 
-    .charity-all-overlay .container {
+    .charity-all-overlay .container,
+    .assoc-all-overlay .container {
       position: relative;
       z-index: 1;
     }
 
-    .charity-all-overlay .hero-title {
+    .charity-all-overlay .hero-title,
+    .assoc-all-overlay .hero-title {
       text-align: center;
       font: normal normal normal 71px/154px Balerno Serif;
       letter-spacing: 7.17px;
@@ -628,21 +627,8 @@
     }
 /* === SUPPORTED ASSOCIATIONS – ALL OVERLAY (Charity All style) === */
 
-    .assoc-all-overlay .container {
-      position: relative;
-      z-index: 1;
-    }
-
-    .assoc-all-overlay .hero-title {
-      text-align: center;
-      font: normal normal normal 71px/154px Balerno Serif;
-      letter-spacing: 7.17px;
-      color: #ffffff;
-      margin: 40px 0;
-    }
-
     /* White rounded stack for Supported Associations */
-    .assoc-stack {
+    .assoc-stack, .stack {
       display: flex;
       flex-direction: column;
       gap: 28px;
@@ -657,42 +643,30 @@
     }
 
     /* Optional: smoother scrolling for nicer UX */
-    .assoc-stack::-webkit-scrollbar {
+    .assoc-stack::-webkit-scrollbar,
+    .stack::-webkit-scrollbar {
       width: 8px;
     }
-
-    .assoc-stack::-webkit-scrollbar-thumb {
-      background-color: rgba(0,0,0,0.2);
-      border-radius: 4px;
-    }
-
-    .assoc-stack::-webkit-scrollbar-track {
-      background-color: transparent;
-    }
-
+ 
 
     /* card layout: image left, text right */
-    .assoc-card {
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr);
-      gap: 32px;
-      padding: 24px;
-      border-radius: 22px;
-      background: #fafafa;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    }
 
     .assoc-media {
-      margin: 0;
-      border-radius: 20px;
-      overflow: hidden;
+        margin: 0;
+        align-self: start;
+        overflow: hidden;
+        width: 100%;
+        height: 250px;
+        border-radius: 12px;
     }
 
     .assoc-media img {
       width: 100%;
       height: 100%;
-      display: block;
       object-fit: cover;
+      border-radius: 12px;
+      transform: scale(1) translateY(0);
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .assoc-body {
@@ -726,35 +700,10 @@
       font-size: 14px;
     }
 
-    .assoc-readmore {
-      color: #a8957b;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    
-
-    @media (max-width: 900px) {
-      .assoc-card {
-        grid-template-columns: 1fr;
-      }
-    }
-    /* stack */
-    .stack {
-      display: grid;
-      gap: 28px;
-      background: #ffffff;
-      border-radius: 20px 20px 0 0;
-      padding: 40px;
-      margin: 40px auto 0;
-      max-width: 1200px;
-      min-height: calc(100vh - var(--navbar-height) - 40px);
-      height: auto;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    }
 
     /* card */
-    .card {
+    .charity-card,
+    .assoc-card {
       border-radius: 18px;
       display: grid;
       grid-template-columns: 1fr 1.2fr;
@@ -763,12 +712,11 @@
       background: #fff;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
       transition: all 0.6s cubic-bezier(0.9, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
       cursor: pointer;
     }
 
-    .card.expanded {
+    .charity-card.expanded,
+    .assoc-card.expanded {
       grid-template-columns: 1fr;
     }
 
@@ -778,7 +726,7 @@
       align-self: start;
       overflow: hidden;
       width: 100%;
-      height: 311px;
+      height: 250px;
       border-radius: 12px;
     }
 
@@ -791,16 +739,21 @@
       transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .card.expanded .media img {
+    .charity-card.expanded .media img {
       transform: scale(1.08) translateY(-6%);
     }
-
+    .assoc-card.expanded .assoc-media img {
+      transform: scale(1.08) translateY(-6%);
+    }
     .body {
       align-self: start;
       transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .card.expanded .body {
+    .charity-card.expanded .body {
+      transform: translateY(10px);
+    }
+    .assoc-card.expanded .body {
       transform: translateY(10px);
     }
 
@@ -833,7 +786,11 @@
       opacity: 0;
     }
 
-    .card.expanded .additional-wrapper {
+    .charity-card.expanded .additional-wrapper {
+      max-height: 1000px; /* just needs to be larger than content */
+      opacity: 1;
+    }
+    .assoc-card.expanded .additional-wrapper {
       max-height: 1000px; /* just needs to be larger than content */
       opacity: 1;
     }
@@ -852,16 +809,17 @@
       letter-spacing: 0.5px;
       border-bottom: 2px solid transparent;
       transition: color 0.3s ease, border-color 0.3s ease;
-      pointer-events: none; /* card handles the click */
+      pointer-events: auto; /* card handles the click */
     }
 
-    .card:hover .read {
+    .charity-card:hover .read {
       color: #8a7a63;
       border-bottom-color: #a8957b;
     }
 
     @media (max-width: 800px) {
-      .card {
+      .charity-card,
+      .assoc-card {
         grid-template-columns: 1fr;
       }
       .media {
@@ -950,6 +908,7 @@
       z-index: 1;
       padding: clamp(28px, 6vh, 60px) 0 clamp(40px, 8vh, 96px);
       text-align: center;
+      top: -75px;
     }
 
     .sa-title {
@@ -1049,12 +1008,10 @@
       }
     }
 
-
     /* === COMPANIES I WORKED FOR ============================== */
 
       .companies {
         position: relative;
-        min-height: 520px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1076,12 +1033,13 @@
       .companies-inner {
         position: relative;
         z-index: 1;
+        max-width: 100%;
         text-align: center;
-        padding: 60px 20px 80px;
+        padding: 0 0 80px;
       }
 
       .companies-title {
-        margin: 0 0 12px;
+        margin: 20px 0 12px;
         font: normal normal normal 62px/127px Balerno Serif;
         letter-spacing: 6.26px;
         text-transform: uppercase;
@@ -1101,105 +1059,129 @@
       /* carousel layout */
       .companies-carousel {
         position: relative;
-        max-width: 960px;
+        width: 100vw;  
+        height: 150%;
         margin: 0 auto;
-        padding: 40px 80px 0;
+        padding: 0;
         display: flex;
         align-items: center;
         justify-content: center;
       }
 
+      /* container for moving bubbles */
       .companies-track {
         position: relative;
         width: 100%;
-        height: 260px;
-        margin-bottom: 20vh;
+        height: 450px;
+        overflow: hidden;        /* hides bubbles as they go off-screen */
       }
 
-      /* Logo bubbles general */
+      /* The circular bubble itself */
       .company-bubble {
         position: absolute;
-        top: 60%;
+        top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%) scale(1);
+        width: 220px;
+        height: 220px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.12);
         display: flex;
         align-items: center;
         justify-content: center;
+        opacity: 0.4;
         transition:
-          transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-          opacity 0.4s ease,
-          box-shadow 0.4s ease,
-          background 0.4s ease;
-        overflow: hidden;
-        opacity: 0;
-        pointer-events: none;
+          transform 0.35s ease,
+          opacity 0.3s ease,
+          filter 0.3s ease;
       }
 
-      /* Ensure that the image fits inside the bubble */
+      /* Make the link fill the bubble */
+      .company-bubble a {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        overflow: hidden;
+        cursor: pointer;
+      }
+
+      /* Make the image fill the link (and therefore the bubble) */
       .company-bubble img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        display: block;
+        border-radius: 50%;
       }
 
-      /* Center bubble - increased size */
-      .company-bubble--center {
-        width: 300px; /* increased from 260px */
-        height: 300px; /* increased from 260px */
-        transform: translate(-50%, -50%);
-        background: #faf7f2;
-        box-shadow:
-          0 20px 50px rgba(0, 0, 0, 0.45),
-          0 0 0 1px rgba(0, 0, 0, 0.06);
-        opacity: 1; /* corrected from 5 */
-        pointer-events: auto;
+      /* Center bubble stronger & bright */
+      .company-bubble.is-center {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.15);
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.65);
+        pointer-events: auto;  
+        cursor: pointer;
         z-index: 5;
       }
 
-      /* Left/Right bubbles - increased size */
-      .company-bubble--left,
-      .company-bubble--right {
-        width: 220px; /* increased from 190px */
-        height: 220px; /* increased from 190px */
-        opacity: 0.8;
-        background: rgba(255, 255, 255, 0.86);
-        box-shadow:
-          0 10px 30px rgba(0, 0, 0, 0.35),
-          0 0 0 1px rgba(0, 0, 0, 0.04);
-        z-index: 4;
+      .companies-track.is-dragging {
+        cursor: grabbing !important;
       }
 
-      /* Far left/right bubbles - increased size */
-      .company-bubble--far-left,
-      .company-bubble--far-right {
-        width: 200px; /* increased from 170px */
-        height: 200px; /* increased from 170px */
-        opacity: 0.6;
-        background: rgba(0, 0, 0, 0.65);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-        z-index: 3;
+      /* Hover ANY bubble → full brightness */
+      .company-bubble:hover {
+        opacity: 1 !important;
+        transform: translate(-50%, -50%) scale(1.08);
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
       }
 
-      /* Positioning */
-      .company-bubble--left {
-        transform: translate(calc(-50% - 300px), -50%); /* updated to match new size */
+      /* Hover center bubble — even bigger highlight */
+      .company-bubble.is-center:hover {
+        transform: translate(-50%, -50%) scale(1.22);
+        box-shadow: 0 28px 70px rgba(0, 0, 0, 0.75);
       }
 
-      .company-bubble--right {
-        transform: translate(calc(-50% + 300px), -50%);
+        /* arrows */
+      .companies-arrow {
+        position: absolute;
+        bottom: 10px; /* Position from the bottom */
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        border: none;
+        background: #ffffff;
+        color: #222;
+        font-size: 20px;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        z-index: 10; /* Ensures buttons are above the bubbles */
       }
 
-      .company-bubble--far-left {
-        transform: translate(calc(-50% - 450px), -50%);
+      .companies-arrow--prev {
+        left: 50%; /* Horizontally center */
+        margin-left: -100px; /* Move it 60px to the left to create the gap */
       }
 
-      .company-bubble--far-right {
-        transform: translate(calc(-50% + 450px), -50%);
+      .companies-arrow--next {
+        left: 50%; /* Horizontally center */
+   /* Move it 60px to the right to create the gap */
       }
 
+      .companies-arrow:hover {
+        transform: translateY(-2px); /* Hover effect */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
 
+      .companies-arrow:active {
+        transform: translateY(0); /* Active effect */
+        box-shadow: 0 5px 16px rgba(0, 0, 0, 0.4);
+      }
+
+      
       /* white card layout */
       .assoc-card-stack {
         background: #fff;
@@ -1209,11 +1191,32 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, .08);
       }
 
+      /* card layout stays as you have it */
       .assoc-card {
         display: grid;
-        grid-template-columns: 1fr 1.2fr;
-        gap: 40px;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr);
+        gap: 32px;
+        padding: 24px;
+        border-radius: 22px;
+        background: #fafafa;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        position: relative;
       }
+
+      /* hidden extra text */
+      .assoc-extra-wrapper {
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.6s ease, opacity 0.4s ease;
+      }
+
+      /* when card is expanded, reveal */
+      .assoc-card.expanded .assoc-extra-wrapper {
+        max-height: 1000px; /* big enough for content */
+        opacity: 1;
+      }
+
 
       .assoc-media img {
         width: 100%;
@@ -1233,11 +1236,23 @@
         opacity: 1;
       }
 
-      .assoc-readmore {
+      .assoc-read-toggle {
+        display: inline-block;
+        margin-top: 4px;
         color: #a8957b;
-        cursor: pointer;
         font-weight: 600;
+        font-size: 15px;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid transparent;
+        transition: color 0.3s ease, border-color 0.3s ease;
+        pointer-events: auto; /* card handles the click */
       }
+
+      .assoc-card:hover .assoc-read-toggle {
+        color: #8a7a63;
+        border-bottom-color: #a8957b;
+      }
+
       /* SUPPORTED ASSOCIATIONS – INDIVIDUAL OVERLAYS */
 
       .sa-overlay .container {
@@ -1254,41 +1269,41 @@
         
       }
 
-      /* White card */
-      .sa-overlay-card {
-        background: #ffffff;
-        border-radius: 20px 20px 0 0;
-        padding: 40px;
-        margin: 40px auto 0;
-        max-width: 1200px;
-        height: calc(90vh - var(--navbar-height) - 80px); /* visible height minus navbar + margin */
-        overflow: hidden; /* prevent overflow */
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        display: grid;
-        grid-template-rows: auto 1fr;
-        gap: 16px;
-      }
+    /* White card */
+    .sa-overlay-card {
+      background: #ffffff;
+      border-radius: 20px 20px 0 0;
+      padding: 40px;
+      margin: 40px auto 0;
+      max-width: 1200px;
+      height: calc(90vh - var(--navbar-height) - 80px); /* visible height minus navbar + margin */
+      overflow: auto; /* prevent overflow */
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 16px;
+    }
 
-      /* Image container */
-      .sa-overlay-media {
-        margin: 0;
-        border-radius: 18px;
-        overflow: hidden;
-        background: #f5f5f5;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        grid-row: 1;
-        width: 100%;   /* fill horizontal space */
-        height: 400px; /* set desired height, can be relative like 50% if needed */   
-      }
+    /* Image container */
+    .sa-overlay-media {
+      margin: 0;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #f5f5f5;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      grid-row: 1;
+      width: 100%;   /* fill horizontal space */
+      height: 400px; /* set desired height, can be relative like 50% if needed */
+    }
 
-      /* Make image cover the container properly */
-      .sa-overlay-media img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* fills container without distortion */
-        object-position: center; /* centers the image */
-      }
+    /* Make image cover the container properly */
+    .sa-overlay-media img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* fills container without distortion */
+      object-position: center; /* centers the image */
+    }
 
 
       .sa-overlay-body {
@@ -1318,108 +1333,7 @@
           grid-template-columns: 1fr;
         }
       }
-      /* arrows */
-      .companies-arrow {
-        position: absolute;
-        bottom: 10px; /* Position from the bottom */
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        border: none;
-        background: #ffffff;
-        color: #222;
-        font-size: 20px;
-        cursor: pointer;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        z-index: 10; /* Ensures buttons are above the bubbles */
-      }
 
-      .companies-arrow--prev {
-        left: 50%; /* Horizontally center */
-        margin-left: -100px; /* Move it 60px to the left to create the gap */
-      }
-
-      .companies-arrow--next {
-        left: 50%; /* Horizontally center */
-        margin-left: 50px; /* Move it 60px to the right to create the gap */
-      }
-
-      .companies-arrow:hover {
-        transform: translateY(-2px); /* Hover effect */
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      }
-
-      .companies-arrow:active {
-        transform: translateY(0); /* Active effect */
-        box-shadow: 0 5px 16px rgba(0, 0, 0, 0.4);
-      }
-
-      @media (max-width: 900px) {
-        .companies-carousel {
-          padding-inline: 20px;
-        }
-
-        .companies-track {
-          height: 220px;
-        }
-
-        .company-bubble--center {
-          width: 220px;
-          height: 220px;
-        }
-
-        .company-bubble--left,
-        .company-bubble--right {
-          width: 160px;
-          height: 160px;
-        }
-
-        .company-bubble--far-left,
-        .company-bubble--far-right {
-          width: 130px;
-          height: 130px;
-        }
-
-        .company-bubble--left {
-          transform: translate(calc(-50% - 200px), -50%);
-        }
-        .company-bubble--right {
-          transform: translate(calc(-50% + 200px), -50%);
-        }
-        .company-bubble--far-left {
-          transform: translate(calc(-50% - 330px), -50%);
-        }
-        .company-bubble--far-right {
-          transform: translate(calc(-50% + 330px), -50%);
-        }
-      }
-
-      @media (max-width: 640px) {
-        .companies-track {
-          height: 210px;
-        }
-
-        .company-bubble--far-left,
-        .company-bubble--far-right {
-          opacity: 0;      /* hide outermost on very small screens */
-        }
-
-        .company-bubble--left {
-          transform: translate(calc(-50% - 160px), -50%);
-        }
-        .company-bubble--right {
-          transform: translate(calc(-50% + 160px), -50%);
-        }
-
-        .companies-arrow--prev {
-          transform: translate(-60px, 0);
-        }
-        .companies-arrow--next {
-          transform: translate(60px, 0);
-        }
-      }
 
     /* CONTACT ------------------------------------------------ */
 
@@ -1438,27 +1352,26 @@
       position: relative;
       z-index: 1;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1.1fr;
       gap: 80px;
       align-items: center;
       width: 100%;
-      max-width: 1600px;
+      max-width: 1700px;
       padding: 0 60px;
     }
 
     /* Container for contact section text */
     .contact-copy {
       width: 100%;
-      margin: 10px auto 34vh; /* reduced bottom spacing from 33vh to 10vh for better layout */
+      margin-bottom: 40%;
       max-width: 800px;       /* optional: limit width for readability */
       padding: 0 30px;        /* horizontal padding for smaller screens */
       box-sizing: border-box;
     }
 
     .contact-title {
-      margin: 10px 0 10px;
       text-align: left;
-      font: normal normal normal 42px/60px var(--font-display);
+      font: normal normal normal 48px/50px var(--font-display);
       letter-spacing: 6.26px;
       color: #a39784;
       text-transform: uppercase;
@@ -1466,7 +1379,7 @@
 
     .contact-lede {
       margin-top: 18px;
-      font: normal normal normal 17px/21px var(--font-body);
+      font: normal normal normal 18px/25px var(--font-body);
       color: #ffffff;
     }
 
