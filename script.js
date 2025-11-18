@@ -18,23 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll('a[data-scroll]').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
 
-      const target = link.getAttribute('data-scroll');
-      const section = document.querySelector(target);
-      if (!section) return;
-
-      // Update URL WITHOUT jumping (# removed)
-      history.pushState(null, "", link.getAttribute('href'));
-
-      // Smooth scroll
-      section.scrollIntoView({ behavior: "smooth" });
-    });
-  });
-});
 
   /* ---------------------------
      CHARITY OVERLAY
@@ -125,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
   cards.forEach(card => {
     const toggle = card.querySelector('.charity-read-toggle');
     const extra  = card.querySelector('.charity-extra-wrapper');
+    const videoSlide = card.querySelector('.video-wrapper');
 
     // carousel parts
     const slides = card.querySelectorAll('.media-slide');
@@ -157,6 +142,18 @@ document.addEventListener('DOMContentLoaded', function () {
         mediaInner.appendChild(dotsWrap);
       }
     }
+    if (videoSlide) {
+      const video = videoSlide.querySelector('video');
+      const playIcon = videoSlide.querySelector('.play-icon');
+
+      videoSlide.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (currentIndex !== Array.from(slides).indexOf(videoSlide)) return;
+
+        video.play();
+        playIcon.style.display = 'none';
+      });
+    }
 
     /* ------------------------------------------
       CAROUSEL FUNCTION
@@ -170,10 +167,27 @@ document.addEventListener('DOMContentLoaded', function () {
       currentIndex = index;
 
       slides.forEach((slide, i) => {
-        slide.classList.toggle('is-active', i === currentIndex);
+        const isActive = i === currentIndex;
+        slide.classList.toggle('is-active', isActive);
+
+        // If slide is a VIDEO → play/pause
+        const video = slide.querySelector('video');
+        const playIcon = slide.querySelector('.play-icon');
+
+        if (video) {
+          if (isActive) {
+            video.currentTime = 0;
+            video.play();
+            if (playIcon) playIcon.style.display = 'none';
+          } else {
+            video.pause();
+            video.currentTime = 0;
+            if (playIcon) playIcon.style.display = 'flex';
+          }
+        }
       });
 
-      // update dots
+      // Update dots
       if (dots.length) {
         dots.forEach((dot, i) => {
           dot.classList.toggle('is-active', i === currentIndex);
