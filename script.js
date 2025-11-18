@@ -18,6 +18,23 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('a[data-scroll]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      const target = link.getAttribute('data-scroll');
+      const section = document.querySelector(target);
+      if (!section) return;
+
+      // Update URL WITHOUT jumping (# removed)
+      history.pushState(null, "", link.getAttribute('href'));
+
+      // Smooth scroll
+      section.scrollIntoView({ behavior: "smooth" });
+    });
+  });
+});
 
   /* ---------------------------
      CHARITY OVERLAY
@@ -105,112 +122,142 @@ document.addEventListener('DOMContentLoaded', function () {
 /* ------------------------------------------
    READ MORE / READ LESS + MEDIA CAROUSEL + DOTS
    ------------------------------------------ */
-cards.forEach(card => {
-  const toggle = card.querySelector('.charity-read-toggle');
-  const extra  = card.querySelector('.charity-extra-wrapper');
+  cards.forEach(card => {
+    const toggle = card.querySelector('.charity-read-toggle');
+    const extra  = card.querySelector('.charity-extra-wrapper');
 
-  // carousel parts
-  const slides = card.querySelectorAll('.media-slide');
-  const prev   = card.querySelector('.media-prev');
-  const next   = card.querySelector('.media-next');
+    // carousel parts
+    const slides = card.querySelectorAll('.media-slide');
+    const prev   = card.querySelector('.media-prev');
+    const next   = card.querySelector('.media-next');
 
-  let currentIndex = 0;
+    let currentIndex = 0;
 
-  /* ------------------------------------------
-     CREATE DOTS ONLY IF >= 2 IMAGES
-     ------------------------------------------ */
-  let dots = [];
-  let dotsWrap = null;
+    /* ------------------------------------------
+      CREATE DOTS ONLY IF >= 2 IMAGES
+      ------------------------------------------ */
+    let dots = [];
+    let dotsWrap = null;
 
-  if (slides.length >= 2) { // Show dots if there are 2 or more images
-    dotsWrap = document.createElement('div');
-    dotsWrap.className = 'media-dots';
-    dotsWrap.style.display = 'none';
+    if (slides.length >= 2) { // Show dots if there are 2 or more images
+      dotsWrap = document.createElement('div');
+      dotsWrap.className = 'media-dots';
+      dotsWrap.style.display = 'none'; // only visible when expanded
 
-    slides.forEach((_slide, i) => {
-      const dot = document.createElement('div');
-      dot.className = 'media-dot';
-      if (i === 0) dot.classList.add('is-active');
-      dotsWrap.appendChild(dot);
-      dots.push(dot);
-    });
-
-    // insert dots after the slides
-    const mediaInner = card.querySelector('.media-inner');
-    mediaInner.appendChild(dotsWrap);
-
-    // Debugging logs
-    console.log('Dots created:', dots.length, 'Dots container:', dotsWrap);
-  }
-
-  /* ------------------------------------------
-     CAROUSEL FUNCTION
-     ------------------------------------------ */
-  function showSlide(index) {
-    if (!slides.length) return;
-
-    if (index < 0) index = slides.length - 1;
-    if (index >= slides.length) index = 0;
-
-    currentIndex = index;
-
-    slides.forEach((slide, i) => {
-      slide.classList.toggle('is-active', i === currentIndex);
-    });
-
-    // update dots
-    if (dots.length) {
-      dots.forEach((dot, i) => {
-        dot.classList.toggle('is-active', i === currentIndex);
+      slides.forEach((_slide, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'media-dot';
+        if (i === 0) dot.classList.add('is-active');
+        dotsWrap.appendChild(dot);
+        dots.push(dot);
       });
-    }
-  }
 
-  /* hide arrows if only 1 slide */
-  if (slides.length <= 1) {
-    if (prev) prev.style.display = 'none';
-    if (next) next.style.display = 'none';
-  } else {
-    showSlide(0);
-
-    if (prev) {
-      prev.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        showSlide(currentIndex - 1);
-      });
+      const mediaInner = card.querySelector('.media-inner');
+      if (mediaInner) {
+        mediaInner.appendChild(dotsWrap);
+      }
     }
 
-    if (next) {
-      next.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        showSlide(currentIndex + 1);
-      });
-    }
-  }
+    /* ------------------------------------------
+      CAROUSEL FUNCTION
+      ------------------------------------------ */
+    function showSlide(index) {
+      if (!slides.length) return;
 
-  /* ------------------------------------------
-     EXPAND / COLLAPSE
-     ------------------------------------------ */
-  if (toggle && extra) {
-    toggle.style.cursor = 'pointer';
+      if (index < 0) index = slides.length - 1;
+      if (index >= slides.length) index = 0;
+
+      currentIndex = index;
+
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('is-active', i === currentIndex);
+      });
+
+      // update dots
+      if (dots.length) {
+        dots.forEach((dot, i) => {
+          dot.classList.toggle('is-active', i === currentIndex);
+        });
+      }
+    }
+
+    /* hide arrows if only 1 slide */
+    if (slides.length <= 1) {
+      if (prev) prev.style.display = 'none';
+      if (next) next.style.display = 'none';
+    } else {
+      showSlide(0);
+
+      if (prev) {
+        prev.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          showSlide(currentIndex - 1);
+        });
+      }
+
+      if (next) {
+        next.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          showSlide(currentIndex + 1);
+        });
+      }
+    }
+
+    /* ------------------------------------------
+      EXPAND / COLLAPSE — ONLY ONE OPEN AT A TIME
+      ------------------------------------------ */
+    if (toggle && extra) {
+      toggle.style.cursor = 'pointer';
 
       toggle.addEventListener('click', (e) => {
         e.stopPropagation();
 
-        card.classList.toggle('expanded');
-        const expanded = card.classList.contains('expanded');
+        const isCurrentlyExpanded = card.classList.contains('expanded');
+        const willExpand = !isCurrentlyExpanded;
 
-        toggle.textContent = expanded ? 'Read less' : 'Read more';
+        // 1) CLOSE ALL OTHER CARDS FIRST
+        cards.forEach(otherCard => {
+          if (otherCard !== card && otherCard.classList.contains('expanded')) {
+            otherCard.classList.remove('expanded');
 
-        // show dots only when expanded
+            // reset their toggle text
+            const otherToggle = otherCard.querySelector('.charity-read-toggle');
+            if (otherToggle) {
+              otherToggle.textContent = 'Read more';
+            }
+
+            // hide their dots
+            const otherDotsWrap = otherCard.querySelector('.media-dots');
+            if (otherDotsWrap) {
+              otherDotsWrap.style.display = 'none';
+            }
+
+            // reset their slides to first
+            const otherSlides = otherCard.querySelectorAll('.media-slide');
+            const otherDots   = otherCard.querySelectorAll('.media-dot');
+
+            otherSlides.forEach((slide, i) => {
+              slide.classList.toggle('is-active', i === 0);
+            });
+            otherDots.forEach((dot, i) => {
+              dot.classList.toggle('is-active', i === 0);
+            });
+          }
+        });
+
+        // 2) TOGGLE THIS CARD
+        card.classList.toggle('expanded', willExpand);
+        toggle.textContent = willExpand ? 'Read less' : 'Read more';
+
+        // show dots only when this one is expanded
         if (dotsWrap) {
-          dotsWrap.style.display = expanded ? 'flex' : 'none';
+          dotsWrap.style.display = willExpand ? 'flex' : 'none';
         }
 
-        // reset slide when collapsing
-        if (!expanded) {
+        // reset slide when collapsing this card
+        if (!willExpand) {
           showSlide(0);
         }
       });
@@ -352,26 +399,41 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
 
-  /* ------------------------------------------
+    /* ------------------------------------------
      C. READ MORE / READ LESS in assoc cards
+        (only one open at a time)
      ------------------------------------------ */
   const assocCards = document.querySelectorAll('.assoc-card');
 
   assocCards.forEach(card => {
-    const toggle = card.querySelector('.assoc-read-toggle');   // 👈 matches your HTML
+    const toggle = card.querySelector('.assoc-read-toggle');
     const extra  = card.querySelector('.assoc-extra-wrapper');
 
-    if (!toggle || !extra) return; // skip if card has no extra content
+    if (!toggle || !extra) return; // skip cards without extra content
 
     toggle.style.cursor = 'pointer';
 
     toggle.addEventListener('click', (e) => {
       e.stopPropagation();
 
-      card.classList.toggle('expanded');
+      const isExpanded = card.classList.contains('expanded');
+      const willExpand = !isExpanded;
 
-      const expanded = card.classList.contains('expanded');
-      toggle.textContent = expanded ? 'Read less' : 'Read more';
+      // 1) CLOSE ALL OTHER assoc-cards
+      assocCards.forEach(otherCard => {
+        if (otherCard !== card && otherCard.classList.contains('expanded')) {
+          otherCard.classList.remove('expanded');
+
+          const otherToggle = otherCard.querySelector('.assoc-read-toggle');
+          if (otherToggle) {
+            otherToggle.textContent = 'Read more';
+          }
+        }
+      });
+
+      // 2) TOGGLE THIS CARD
+      card.classList.toggle('expanded', willExpand);
+      toggle.textContent = willExpand ? 'Read less' : 'Read more';
     });
   });
 });

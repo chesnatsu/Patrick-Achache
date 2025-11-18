@@ -19,22 +19,22 @@
     <div class="spinner"></div>
   </div>
 
-  <!-- NAVBAR -->
+<!-- NAVBAR -->
   <header class="nav-wrap">
     <div class="container nav-bar">
       <nav class="nav-left">
-        <a href="#home" class="nav-link">Home</a>
-        <a href="#about" class="nav-link">About</a>
-        <a href="#charity" class="nav-link">Charity</a>
+        <a href="/home" data-scroll="#home" class="nav-link">Home</a>
+        <a href="/about" data-scroll="#about" class="nav-link">About</a>
+        <a href="/charity" data-scroll="#charity" class="nav-link">Charity</a>
       </nav>
 
-      <a href="#home" class="nav-center" aria-label="PA logo">
+      <a href="/home" data-scroll="#home" class="nav-center" aria-label="PA logo" data-section="home">
         <img src="images/PA-Images/PA-only-logo-new (1).png" alt="PA Logo" class="logo-img" />
       </a>
 
       <nav class="nav-right">
-        <a href="#associations" class="nav-link">Supported Associations</a>
-        <a href="#contact" class="nav-link">Contact</a>
+        <a href="/associations" data-scroll="#associations" class="nav-link">Supported Associations</a>
+        <a href="/contact" data-scroll="#contact" class="nav-link">Contact</a>
       </nav>
     </div>
   </header>
@@ -679,8 +679,6 @@
         </div>
       </section>
 
-
-
     <!-- SUPPORTED ASSOCIATIONS -->
     <section id="associations" class="sa">
       <div class="pattern"></div>
@@ -823,9 +821,11 @@
           <div class="sa-overlay-body">
             <h2 class="sa-overlay-title">ART & ADVOCACY INITIATIVES</h2>
 
-            <p>
+            <p class="paragraph">
               Patrick supports art-focused organizations that use creativity as a tool for advocacy,
-              education and community empowerment.<br>
+              education and community empowerment.
+            </p>
+            <p>
               Through exhibitions, workshops and public projects, these groups give a voice to
               underrepresented communities.
             </p>
@@ -849,7 +849,7 @@
           <div class="sa-overlay-body">
             <h2 class="sa-overlay-title">COASTAL CLEANUP INITIATIVES</h2>
 
-            <p>
+            <p class="paragraph">
               Environmental stewardship is a core value for Patrick, who actively participates in
               coastal cleanup campaigns.
             </p>
@@ -1197,7 +1197,6 @@
             </div>
           </article>
 
-          <!-- add more assoc-card blocks following the same pattern -->
         </div>
       </section>
 
@@ -1296,8 +1295,6 @@
         </div>
       </div>
     </section>
-
-
 
     <!-- CONTACT -->
     <section id="contact" class="contact">
