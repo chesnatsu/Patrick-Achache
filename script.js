@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Animate hero after loader
         animateHero();
-      }, 800);
+      }, 400);
     });
 
     // NAV LINK CLICK
