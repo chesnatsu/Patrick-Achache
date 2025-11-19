@@ -92,7 +92,7 @@
       position: sticky;
       top: 0;
       z-index: 2000;   
-      background: rgba(255, 255, 255, 0.86);
+      background: #ffffff;
     }
 
     .nav-bar {
@@ -148,7 +148,7 @@
     .sa-overlay-body p.paragraph {
       margin-bottom: 1.5em;
     }
-    
+
     /* Lightbox container */
     #image-lightbox {
       position: fixed;
@@ -169,6 +169,13 @@
       max-height: 92vh;
       border-radius: 12px;
       transition: transform 0.3s ease;
+    }
+    
+    .lightbox-backdrop {
+      position: absolute;
+      inset: 0; /* top:0; right:0; bottom:0; left:0; */
+      cursor: grab;
+      z-index: 1000;
     }
 
     /* Top-right controls */
@@ -269,30 +276,6 @@
       height: 100%;
       object-fit: cover;
       z-index: 0;
-
-      /* animation */
-      opacity: 0;
-      transform: translateX(-40px);
-      animation: heroBgSlide 1.2s ease-out forwards;
-    }
-
-    @keyframes heroBgSlide {
-      0% {
-        opacity: 0;
-        transform: translateX(-40px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-
-    .hero-shade {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.5));
-      mix-blend-mode: multiply;
     }
 
     .hero-content {
@@ -303,18 +286,18 @@
       justify-content: center;
       width: 100%;
       max-width: 2000px;
-      padding: 0 clamp(20px, 4vw, 80px) clamp(24px, 8vh, 60px);
+
       box-sizing: border-box;
     }
 
     .hero-portrait {
-      width: clamp(420px, 42vw, 770px);
+      width: clamp(400px, 42vw, 700px);
       height: auto;
       object-fit: contain;
       align-self: flex-end;
       margin-left: -8vh;
       filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.35));
-      transform: translateY(10%);
+
     }
 
     .hero-text {
@@ -322,21 +305,7 @@
       color: #fff;
       text-align: left;
       margin-bottom: 19%;
-      opacity: 0;
-      transform: translateX(40px);
-      animation: heroTextSlide 1.2s ease-out forwards;
-      animation-delay: 0.35s; /* small delay for a nice stagger */
-    }
-
-    @keyframes heroTextSlide {
-      0% {
-        opacity: 0;
-        transform: translateX(40px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateX(0);
-      }
+      opacity: 1;
     }
 
     .hero-name {
@@ -357,16 +326,6 @@
       opacity: 0.7;
     }
 
-    @keyframes slide-left {
-      0% {
-        opacity: 0;
-        transform: translateX(-50px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
 
     /* ABOUT VIEW (same look as your Vue version) */
     .about {
@@ -703,7 +662,7 @@
       z-index: 1;
       text-align: center;
       margin-bottom: 10%;
-      top: -30px;
+      top: -45px;
     }
 
     .charity-title {
@@ -796,7 +755,8 @@
       color: #ffffff;
       margin-bottom: -1%;
     }
-/* === SUPPORTED ASSOCIATIONS – ALL OVERLAY (Charity All style) === */
+
+    /* === SUPPORTED ASSOCIATIONS – ALL OVERLAY (Charity All style) === */
 
     /* White rounded stack for Supported Associations */
     .assoc-stack, .stack {
@@ -1229,7 +1189,7 @@
       z-index: 1;
       padding: clamp(28px, 6vh, 60px) 0 clamp(40px, 8vh, 96px);
       text-align: center;
-      top: -75px;
+      top: -95px;
     }
 
     .sa-title {
@@ -1253,16 +1213,15 @@
     .sa-grid-top {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 5px;
+      gap: 10px;
       padding: 5px;
-      margin-bottom: -4px;
     }
 
     /* BOTTOM ROW — 3 items */
     .sa-grid-bottom {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 5px;
+      gap: 10px;
       padding: 5px;
       margin-bottom: 35px;
     }
@@ -1277,7 +1236,7 @@
 
     .sa-item img {
       width: 100%;
-      height: 200px;
+      height: 250px;
       object-fit: cover;
       transition: transform 0.3s ease;
     }
@@ -1787,6 +1746,53 @@
         order: 2;
       }
     }
+
+    /* ===========================
+      GLOBAL SLIDE ANIMATIONS
+      =========================== */
+
+    /* BASE (always visible unless animating) */
+    [data-anim] {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* LEFT */
+    @keyframes slideFromLeft {
+      from { opacity: 0; transform: translateX(-100px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .animate-from-left {
+      animation: slideFromLeft 0.8s ease-out;
+    }
+
+    /* RIGHT */
+    @keyframes slideFromRight {
+      from { opacity: 0; transform: translateX(100px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .animate-from-right {
+      animation: slideFromRight 0.8s ease-out;
+    }
+
+    /* TOP */
+    @keyframes slideFromTop {
+      from { opacity: 0; transform: translateY(-100px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate-from-top {
+      animation: slideFromTop 0.8s ease-out;
+    }
+
+    /* BOTTOM */
+    @keyframes slideFromBottom {
+      from { opacity: 0; transform: translateY(100px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate-from-bottom {
+      animation: slideFromBottom 0.8s ease-out;
+    }
+
 
     footer {
       padding: 20px;

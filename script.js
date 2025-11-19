@@ -1,4 +1,49 @@
 document.getElementById("year").textContent = new Date().getFullYear();
+  // ---------------------------------------------------
+  // GLOBAL ANIMATION TRIGGER
+  // ---------------------------------------------------
+function triggerAnimation(element, direction = "left") {
+  if (!element) return;
+
+    element.classList.remove("animate-from-left", "animate-from-right");
+  void element.offsetWidth; // reset animation
+
+  if (direction === "left") {
+    element.classList.add("animate-from-left");
+  } else {
+    element.classList.add("animate-from-right");
+  }
+  // remove all animation classes
+  element.classList.remove(
+    "animate-from-left",
+    "animate-from-right",
+    "animate-from-top",
+    "animate-from-bottom"
+  );
+
+  // Force reflow to allow retrigger
+  void element.offsetWidth;
+
+  const classMap = {
+    left: "animate-from-left",
+    right: "animate-from-right",
+    top: "animate-from-top",
+    bottom: "animate-from-bottom"
+  };
+
+  const cls = classMap[direction] || "animate-from-left";
+
+  element.classList.add(cls);
+
+  // Remove after animation
+  element.addEventListener(
+    "animationend",
+    () => element.classList.remove(cls),
+    { once: true }
+  );
+}
+
+
 document.addEventListener('DOMContentLoaded', function () {
   const aboutOverlay = document.getElementById('aboutme-overlay');
   const aboutOpen    = document.querySelector('.js-about-open');
@@ -16,8 +61,37 @@ document.addEventListener('DOMContentLoaded', function () {
       aboutOverlay.classList.remove('is-visible');
     }
   });
-});
+    document.querySelector('[href="#home"]').addEventListener("click", () => {
+      triggerAnimation(document.querySelector("#home .hero-content"), "left");
+      triggerAnimation(document.querySelector("#home .hero-text"), "right");
+  });
+    document.querySelector('[href="#about"]').addEventListener("click", () => {
+      triggerAnimation(document.querySelector("#about .copy"), "left");
+      triggerAnimation(document.querySelector("#about .image-stack"), "right");
+  });
+    document.querySelector('[href="#charity"]').addEventListener("click", () => {
+      triggerAnimation(document.querySelector("#charity .charity-content"), "bottom");
+  });
+    // When clicking Supported Associations nav link
+    const assocNavLink = document.querySelector('[href="#associations"]');
 
+    assocNavLink.addEventListener("click", () => {
+      const saItems = document.querySelectorAll("#associations .sa-item");
+
+      // Animate items individually
+      saItems.forEach((item, index) => {
+        const itemIndex = index + 1; // convert 0-based → 1-based numbering
+
+        if ([1, 2, 5].includes(itemIndex)) {
+          // items 1, 2, 5 slide from left
+          triggerAnimation(item, "left");
+        } else {
+          // items 3, 4, 6, 7 slide from right
+          triggerAnimation(item, "right");
+        }
+      });
+    });
+});
 
 
   /* ---------------------------
