@@ -1644,7 +1644,7 @@
     /* Container for contact section text */
     .contact-copy {
       width: 100%;
-      margin-bottom: 34%;
+      margin-bottom: 31%;
       max-width: 800px;       /* optional: limit width for readability */
       padding: 0 30px;        /* horizontal padding for smaller screens */
       box-sizing: border-box;
@@ -1791,6 +1791,14 @@
     }
     .animate-from-bottom {
       animation: slideFromBottom 0.8s ease-out;
+    }
+    @keyframes heroSlideFromLeft {
+      from { opacity: 0; transform: translateX(-100px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .animate-hero-left {
+      animation: heroSlideFromLeft 0.9s ease-out forwards;
     }
 
 

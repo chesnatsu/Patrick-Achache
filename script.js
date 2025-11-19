@@ -45,59 +45,48 @@ function triggerAnimation(element, direction = "left") {
 
 
 document.addEventListener('DOMContentLoaded', function () {
+
+  // --- Existing About Overlay ---
   const aboutOverlay = document.getElementById('aboutme-overlay');
   const aboutOpen    = document.querySelector('.js-about-open');
 
-  if (!aboutOverlay || !aboutOpen) return;
-
-  // open
-  aboutOpen.addEventListener('click', () => {
-    aboutOverlay.classList.add('is-visible');
-  });
-
-  // close by clicking the dark backdrop
-  aboutOverlay.addEventListener('click', (e) => {
-    if (e.target === aboutOverlay) {
-      aboutOverlay.classList.remove('is-visible');
-    }
-  });
-    document.querySelector('[href="#home"]').addEventListener("click", () => {
-      triggerAnimation(document.querySelector("#home .hero-content"), "left");
-      triggerAnimation(document.querySelector("#home .hero-text"), "right");
-  });
-    document.querySelector('[href="#about"]').addEventListener("click", () => {
-      triggerAnimation(document.querySelector("#about .copy"), "left");
-      triggerAnimation(document.querySelector("#about .image-stack"), "right");
-  });
-    document.querySelector('[href="#charity"]').addEventListener("click", () => {
-      triggerAnimation(document.querySelector("#charity .charity-content"), "bottom");
-  });
-    // When clicking Supported Associations nav link
-    const assocNavLink = document.querySelector('[href="#associations"]');
-
-    assocNavLink.addEventListener("click", () => {
-      const saItems = document.querySelectorAll("#associations .sa-item");
-
-      // Animate items individually
-      saItems.forEach((item, index) => {
-        const itemIndex = index + 1; // convert 0-based → 1-based numbering
-
-        if ([1, 2, 5].includes(itemIndex)) {
-          // items 1, 2, 5 slide from left
-          triggerAnimation(item, "left");
-        } else {
-          // items 3, 4, 6, 7 slide from right
-          triggerAnimation(item, "right");
-        }
-      });
+  if (aboutOverlay && aboutOpen) {
+    aboutOpen.addEventListener('click', () => {
+      aboutOverlay.classList.add('is-visible');
     });
-});
 
+    aboutOverlay.addEventListener('click', (e) => {
+      if (e.target === aboutOverlay) aboutOverlay.classList.remove('is-visible');
+    });
+  }
 
-  /* ---------------------------
+  // --- Navigation Link Animations ---
+  document.querySelector('[href="#home"]').addEventListener("click", () => {
+    triggerAnimation(heroContent, "left");
+    triggerAnimation(heroText, "right");
+  });
+
+  document.querySelector('[href="#about"]').addEventListener("click", () => {
+    triggerAnimation(document.querySelector("#about .copy"), "left");
+    triggerAnimation(document.querySelector("#about .image-stack"), "right");
+  });
+
+  document.querySelector('[href="#charity"]').addEventListener("click", () => {
+    triggerAnimation(document.querySelector("#charity .charity-content"), "bottom");
+  });
+
+  const assocNavLink = document.querySelector('[href="#associations"]');
+  assocNavLink.addEventListener("click", () => {
+    const saItems = document.querySelectorAll("#associations .sa-item");
+    saItems.forEach((item, index) => {
+      const itemIndex = index + 1;
+      triggerAnimation(item, [1,2,5].includes(itemIndex) ? "left" : "right");
+    });
+  });
+
+    /* ---------------------------
      CHARITY OVERLAY
      --------------------------- */
-document.addEventListener('DOMContentLoaded', function () {
   const charityOverlay = document.getElementById('charity-overlay');
   const charityOpen    = document.querySelector('.js-charity-open');
 
@@ -351,208 +340,221 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
   });
-});
 
-/* -------------------------------------------------------
-   AUTO-SLIDE CAROUSEL — Only when card is EXPANDED
-------------------------------------------------------- */
-document.querySelectorAll('.charity-card').forEach(card => {
-  const mediaInner = card.querySelector('.media-inner');
-  if (!mediaInner) return;
-
-  const slides = mediaInner.querySelectorAll('.media-slide');
-  const prevBtn = mediaInner.querySelector('.media-prev');
-  const nextBtn = mediaInner.querySelector('.media-next');
-
-  if (slides.length <= 1) return; // No carousel needed
-
-  let index = 0;
-  let autoTimer = null;
-
-  function showSlide(i) {
-    slides.forEach(s => s.classList.remove('is-active'));
-    slides[i].classList.add('is-active');
-
-    // Sync dots if present
-    const dots = mediaInner.querySelectorAll('.media-dot');
-    if (dots.length) {
-      dots.forEach(d => d.classList.remove('is-active'));
-      dots[i].classList.add('is-active');
-    }
-  }
-
-  function nextSlide() {
-    index = (index + 1) % slides.length;
-    showSlide(index);
-  }
-
-  function prevSlide() {
-    index = (index - 1 + slides.length) % slides.length;
-    showSlide(index);
-  }
-
-  function startAuto() {
-    if (autoTimer) clearInterval(autoTimer);
-    autoTimer = setInterval(nextSlide, 3000);
-  }
-
-  function stopAuto() {
-    clearInterval(autoTimer);
-    autoTimer = null;
-  }
-
-  // Buttons reset auto-slide
-  if (nextBtn) nextBtn.addEventListener('click', () => {
-    nextSlide();
-    if (card.classList.contains('expanded')) startAuto();
-  });
-
-  if (prevBtn) prevBtn.addEventListener('click', () => {
-    prevSlide();
-    if (card.classList.contains('expanded')) startAuto();
-  });
-
-  // Start/Stop auto-slide when card expands/collapses
-  const toggleBtn = card.querySelector('.charity-read-toggle');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-      // Wait for class toggle to finish
-      setTimeout(() => {
-        if (card.classList.contains('expanded')) {
-          startAuto();
-        } else {
-          stopAuto();
-        }
-      }, 50);
-    });
-  }
-
-  // Also stop auto-slide if user closes overlay
-  card.addEventListener('transitionend', () => {
-    if (!card.classList.contains('expanded')) stopAuto();
-  });
-});
-
-
-  /* ---------------------------
+    /* ---------------------------
      SUPPORTED ASSOCIATION
      --------------------------- */
 
-document.addEventListener('DOMContentLoaded', function () {
-  const assocOverlay = document.getElementById('associations-overlay');
-  const assocOpen    = document.querySelector('.js-assoc-open');
+      const assocOverlay = document.getElementById('associations-overlay');
+      const assocOpen    = document.querySelector('.js-assoc-open');
 
-  /* ------------------------------------------
-     A. Individual SA overlays (small Read More)
-     ------------------------------------------ */
-  document.querySelectorAll('.js-sa-open').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+      /* ------------------------------------------
+        A. Individual SA overlays (small Read More)
+        ------------------------------------------ */
+      document.querySelectorAll('.js-sa-open').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
 
-      const key = btn.dataset.assoc;            // e.g. "foodbank"
-      const overlay = document.getElementById('sa-' + key); // "sa-foodbank"
+          const key = btn.dataset.assoc;            // e.g. "foodbank"
+          const overlay = document.getElementById('sa-' + key); // "sa-foodbank"
 
-      if (overlay) {
-        overlay.classList.add('is-visible');
-      }
-    });
-  });
-
-  // Close the small SA overlays by clicking the backdrop
-  document.querySelectorAll('.sa-overlay').forEach(overlay => {
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
-        overlay.classList.remove('is-visible');
-      }
-    });
-  });
-
-
-  /* ------------------------------------------
-     B. View All overlay (associations-overlay)
-     ------------------------------------------ */
-  if (assocOverlay && assocOpen) {
-    // open
-    assocOpen.addEventListener('click', () => {
-      assocOverlay.classList.add('is-visible');
-    });
-
-    // close by clicking backdrop
-    assocOverlay.addEventListener('click', (e) => {
-      if (e.target === assocOverlay) {
-        assocOverlay.classList.remove('is-visible');
-      }
-    });
-  }
-
-
-    /* ------------------------------------------
-     C. READ MORE / READ LESS in assoc cards
-        (only one open at a time)
-     ------------------------------------------ */
-  const assocCards = document.querySelectorAll('.assoc-card');
-
-  assocCards.forEach(card => {
-    const toggle = card.querySelector('.assoc-read-toggle');
-    const extra  = card.querySelector('.assoc-extra-wrapper');
-
-    if (!toggle || !extra) return; // skip cards without extra content
-
-    toggle.style.cursor = 'pointer';
-
-    toggle.addEventListener('click', (e) => {
-      e.stopPropagation();
-
-      const isExpanded = card.classList.contains('expanded');
-      const willExpand = !isExpanded;
-
-      // 1) CLOSE ALL OTHER assoc-cards
-      assocCards.forEach(otherCard => {
-        if (otherCard !== card && otherCard.classList.contains('expanded')) {
-          otherCard.classList.remove('expanded');
-
-          const otherToggle = otherCard.querySelector('.assoc-read-toggle');
-          if (otherToggle) {
-            otherToggle.textContent = 'Read more';
+          if (overlay) {
+            overlay.classList.add('is-visible');
           }
-        }
+        });
       });
 
-      // 2) TOGGLE THIS CARD
-      card.classList.toggle('expanded', willExpand);
-      toggle.textContent = willExpand ? 'Read less' : 'Read more';
+      // Close the small SA overlays by clicking the backdrop
+      document.querySelectorAll('.sa-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) {
+            overlay.classList.remove('is-visible');
+          }
+        });
+      });
+
+
+      /* ------------------------------------------
+        B. View All overlay (associations-overlay)
+        ------------------------------------------ */
+      if (assocOverlay && assocOpen) {
+        // open
+        assocOpen.addEventListener('click', () => {
+          assocOverlay.classList.add('is-visible');
+        });
+
+        // close by clicking backdrop
+        assocOverlay.addEventListener('click', (e) => {
+          if (e.target === assocOverlay) {
+            assocOverlay.classList.remove('is-visible');
+          }
+        });
+      }
+
+
+        /* ------------------------------------------
+        C. READ MORE / READ LESS in assoc cards
+            (only one open at a time)
+        ------------------------------------------ */
+      const assocCards = document.querySelectorAll('.assoc-card');
+
+      assocCards.forEach(card => {
+        const toggle = card.querySelector('.assoc-read-toggle');
+        const extra  = card.querySelector('.assoc-extra-wrapper');
+
+        if (!toggle || !extra) return; // skip cards without extra content
+
+        toggle.style.cursor = 'pointer';
+
+        toggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+
+          const isExpanded = card.classList.contains('expanded');
+          const willExpand = !isExpanded;
+
+          // 1) CLOSE ALL OTHER assoc-cards
+          assocCards.forEach(otherCard => {
+            if (otherCard !== card && otherCard.classList.contains('expanded')) {
+              otherCard.classList.remove('expanded');
+
+              const otherToggle = otherCard.querySelector('.assoc-read-toggle');
+              if (otherToggle) {
+                otherToggle.textContent = 'Read more';
+              }
+            }
+          });
+
+          // 2) TOGGLE THIS CARD
+          card.classList.toggle('expanded', willExpand);
+          toggle.textContent = willExpand ? 'Read less' : 'Read more';
+        });
+      });
     });
-  });
-});
 
-document.addEventListener('DOMContentLoaded', function () {
-  const navLinks = document.querySelectorAll('.nav-link, .nav-center');
+      /* -------------------------------------------------------
+        AUTO-SLIDE CAROUSEL — Only when card is EXPANDED
+      ------------------------------------------------------- */
+      document.querySelectorAll('.charity-card').forEach(card => {
+        const mediaInner = card.querySelector('.media-inner');
+        if (!mediaInner) return;
 
-  const allOverlays = document.querySelectorAll(
-    '.aboutme-overlay, ' +
-    '.charity-all-overlay, ' +
-    '.assoc-all-overlay, ' +
-    '.sa-overlay, ' +
-    '.assoc-overlay'
-  );
+        const slides = mediaInner.querySelectorAll('.media-slide');
+        const prevBtn = mediaInner.querySelector('.media-prev');
+        const nextBtn = mediaInner.querySelector('.media-next');
 
-  navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      allOverlays.forEach(ov => ov.classList.remove('is-visible'));
+        if (slides.length <= 1) return; // No carousel needed
+
+        let index = 0;
+        let autoTimer = null;
+
+        function showSlide(i) {
+          slides.forEach(s => s.classList.remove('is-active'));
+          slides[i].classList.add('is-active');
+
+          // Sync dots if present
+          const dots = mediaInner.querySelectorAll('.media-dot');
+          if (dots.length) {
+            dots.forEach(d => d.classList.remove('is-active'));
+            dots[i].classList.add('is-active');
+          }
+        }
+
+        function nextSlide() {
+          index = (index + 1) % slides.length;
+          showSlide(index);
+        }
+
+        function prevSlide() {
+          index = (index - 1 + slides.length) % slides.length;
+          showSlide(index);
+        }
+
+        function startAuto() {
+          if (autoTimer) clearInterval(autoTimer);
+          autoTimer = setInterval(nextSlide, 3000);
+        }
+
+        function stopAuto() {
+          clearInterval(autoTimer);
+          autoTimer = null;
+        }
+
+        // Buttons reset auto-slide
+        if (nextBtn) nextBtn.addEventListener('click', () => {
+          nextSlide();
+          if (card.classList.contains('expanded')) startAuto();
+        });
+
+        if (prevBtn) prevBtn.addEventListener('click', () => {
+          prevSlide();
+          if (card.classList.contains('expanded')) startAuto();
+        });
+
+        // Start/Stop auto-slide when card expands/collapses
+        const toggleBtn = card.querySelector('.charity-read-toggle');
+        if (toggleBtn) {
+          toggleBtn.addEventListener('click', () => {
+            // Wait for class toggle to finish
+            setTimeout(() => {
+              if (card.classList.contains('expanded')) {
+                startAuto();
+              } else {
+                stopAuto();
+              }
+            }, 50);
+          });
+        }
+
+        // Also stop auto-slide if user closes overlay
+        card.addEventListener('transitionend', () => {
+          if (!card.classList.contains('expanded')) stopAuto();
+        });
+      });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const navLinks = document.querySelectorAll('.nav-link, .nav-center');
+      const allOverlays = document.querySelectorAll(
+        '.aboutme-overlay, ' +
+        '.charity-all-overlay, ' +
+        '.assoc-all-overlay, ' +
+        '.sa-overlay, ' +
+        '.assoc-overlay'
+      );
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          allOverlays.forEach(ov => ov.classList.remove('is-visible'));
+        });
+      });
     });
-  });
-});
 
-// PAGE LOADING SCREEN
-window.addEventListener("load", () => {
-  const loader = document.getElementById("loader");
-  setTimeout(() => {
-    loader.classList.add("fade-out");
-  }, 800); // slight delay for smooth effect
-});
+    // Function to trigger hero animations
+    function animateHero() {
+      const heroContent = document.querySelector("#home .hero-content");
+      const heroText = document.querySelector("#home .hero-text");
 
+      if (heroContent) triggerAnimation(heroContent, "left");
+      if (heroText) triggerAnimation(heroText, "right");
+    }
 
+    // PAGE LOAD
+    window.addEventListener("load", () => {
+      const loader = document.getElementById("loader");
+
+      setTimeout(() => {
+        loader.classList.add("fade-out");
+
+        // Animate hero after loader
+        animateHero();
+      }, 800);
+    });
+
+    // NAV LINK CLICK
+    document.querySelector('[href="#home"]').addEventListener("click", () => {
+      animateHero();
+    });
 
 
   // ----------------------------------------------------
