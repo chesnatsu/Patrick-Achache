@@ -782,35 +782,16 @@
       width: 8px;
     }
 
-    /* card layout: image left, text right */
 
-    .assoc-media {
-      margin: 0;
-      align-self: start;
-      overflow: hidden;
-      width: 100%;
-      height: 250px;
-      border-radius: 12px;
-    }
-
-    .assoc-media img {
+    /* only this one */
+    .media img.assoc-img-adjust {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 12px;
-      transform: scale(1) translateY(0);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      object-position: center -37vh; /* adjust this to move up/down */
+      transform: scale(1.05);
     }
-    .assoc-media img {
-      pointer-events: auto !important;
-      position: relative;
-      z-index: 10;
-      cursor: zoom-in;
-    }
-    .assoc-body {
-      align-self: start;
-    }
-
+    
     .assoc-title {
       font: normal normal 600 18px/1.3 "Inter", system-ui, sans-serif;
       letter-spacing: 0.18em;
@@ -830,7 +811,8 @@
       text-decoration: underline;
     }
 
-    .assoc-body p {
+    .assoc-body p,
+    .charity-body p {
       margin: 0 0 12px;
       line-height: 1.6;
       color: #4c4c47;
@@ -847,18 +829,20 @@
       background: #fff;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
       transition: all 0.6s cubic-bezier(0.9, 0, 0.2, 1);
-      cursor: pointer;
     }
-
+    .contact-link {
+      color: red;
+      text-decoration: none; /* optional: remove underline */
+    }
     /* base transition */
     .charity-card:not(.expanded) .media img,
-    .assoc-card:not(.expanded) .assoc-media img {
+    .assoc-card:not(.expanded) .media img {
       transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* hover animation */
     .charity-card:not(.expanded) .media:hover img,
-    .assoc-card:not(.expanded) .assoc-media:hover img {
+    .assoc-card:not(.expanded) .media:hover img {
       transform: scale(1.08) rotate(3deg);
     }
 
@@ -997,27 +981,43 @@
       opacity: 1;
       pointer-events: auto;
     }
+
+    .assoc-card.expanded .media-nav {
+      opacity: 1;
+      pointer-events: auto;
+    }
     
+    .media-nav {
+      z-index: 50 !important;
+    }
+
     .media img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       border-radius: 12px;
       transform: scale(1) translateY(0);
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .assoc-card.expanded .assoc-media img,
+    .assoc-card.expanded .media img,
     .charity-card.expanded .media img {
       transform: scale(1) translateY(-1%);
     }
 
     /* when expanded, only the media area grows to 400px */
     .charity-card.expanded .media,
-    .assoc-card.expanded .assoc-media {
+    .assoc-card.expanded .media {
       height: 450px;
     }
-    
+    /* Override ONLY this image */
+    .assoc-card.expanded .media img.assoc-img-adjust {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center -110vh; /* adjust this to move up/down */
+      transform: scale(1.05);
+    }
     .body {
       align-self: start;
       transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1038,12 +1038,6 @@
       color: #2e2b27;
       line-height: 1.3;
       font-weight: 600;
-    }
-
-    .lede {
-      margin: 0 0 16px;
-      color: #6d6b66;
-      font-size: 16px;
     }
 
     .additional-content {
@@ -1234,10 +1228,10 @@
       padding: 0 16px;
       text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
     }
-    /* TOP ROW — 4 items */
+    /* TOP ROW — 3 items */
     .sa-grid-top {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       padding: 5px;
     }
@@ -1264,6 +1258,10 @@
       height: 250px;
       object-fit: cover;
       transition: transform 0.3s ease;
+    }
+    .caring-image {
+      object-fit: cover;
+      object-position: center -35vh; /* move image UP */
     }
 
     .sa-item:hover img {
@@ -1498,7 +1496,6 @@
       box-shadow: 0 5px 16px rgba(0, 0, 0, 0.4);
     }
 
-    
     /* white card layout */
     .assoc-card-stack {
       background: #fff;
@@ -1506,18 +1503,6 @@
       padding: 40px;
       margin-bottom: 60px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, .08);
-    }
-
-    /* card layout stays as you have it */
-    .assoc-card {
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr);
-      gap: 32px;
-      padding: 24px;
-      border-radius: 22px;
-      background: #fafafa;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      position: relative;
     }
 
     /* hidden extra text */
@@ -1535,12 +1520,6 @@
       max-height: 1000px; /* big enough for content */
       opacity: 1;
     }
-
-    .assoc-media img {
-      width: 100%;
-      border-radius: 14px;
-    }
-
 
     .assoc-read-toggle {
       display: inline-block;
@@ -1610,6 +1589,21 @@
       object-fit: cover; /* fills container without distortion */
       object-position: center; /* centers the image */
     }
+
+    /* ALL images */
+    .sa-overlay-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;  /* default */
+    }
+
+    /* ONLY the Caring & Healing image */
+    .sa-overlay-media img.sa-caring-image {
+      object-position: center -120vh; /* move up */
+      transform: scale(1.03);       /* optional */
+    }
+
 
     .sa-overlay-body {
       align-self: start;
