@@ -73,15 +73,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  function loadOverlayImages(root) {
-  const imgs = root.querySelectorAll('img[data-src]');
-  imgs.forEach(img => {
-    if (!img.src) {
-      img.src = img.dataset.src;
-    }
-  });
-}
-
   /* ---------------------------
     CHARITY OVERLAY
     --------------------------- */
@@ -92,9 +83,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // OPEN overlay
   charityOpen.addEventListener('click', () => {
-  charityOverlay.classList.add('is-visible');
-  loadOverlayImages(charityOverlay);
-});
+    showOverlay(charityOverlay);
+  });
 
   // CLOSE overlay by clicking backdrop
   charityOverlay.addEventListener('click', (e) => {
@@ -770,26 +760,18 @@ document.addEventListener('DOMContentLoaded', function () {
       if (heroContent) triggerAnimation(heroContent, "left");
       if (heroText) triggerAnimation(heroText, "right");
     }
-// Replace your window.load loader with something like this:
 
-    function hideLoaderAndAnimate() {
-      const loader = document.getElementById("loader");
-      if (!loader || loader.classList.contains("fade-out")) return;
-
-      loader.classList.add("fade-out");
-      animateHero();
-    }
-
-    // 1) Hide as soon as HTML is ready (fast)
-    document.addEventListener("DOMContentLoaded", () => {
-      setTimeout(hideLoaderAndAnimate, 500); // small delay for polish
-    });
-
-    // 2) Safety fallback after full load (or very slow images)
+    // PAGE LOAD
     window.addEventListener("load", () => {
-      setTimeout(hideLoaderAndAnimate, 2000); // only runs if not already hidden
-    });
+      const loader = document.getElementById("loader");
 
+      setTimeout(() => {
+        loader.classList.add("fade-out");
+
+        // Animate hero after loader
+        animateHero();
+      }, 100);
+    });
 
     // NAV LINK CLICK
     document.querySelector('[href="#home"]').addEventListener("click", () => {
