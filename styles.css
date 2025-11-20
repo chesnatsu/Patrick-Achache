@@ -655,8 +655,8 @@
       background-image: url("images/PA-Images/Charity_bg.png"); /* update path */
       background-repeat: repeat;
       background-size: 1920px auto;
-      opacity: 0.75;
-      filter: contrast(0.95) brightness(0.9);
+      mix-blend-mode: multiply;
+      filter: contrast(0.95) brightness(3.5);
     }
 
     .charity-content {
@@ -1691,7 +1691,7 @@
     /* Container for contact section text */
     .contact-copy {
       width: 100%;
-      margin-bottom: 31%;
+      margin-bottom: 32.2%;
       max-width: 800px;       /* optional: limit width for readability */
       padding: 0 30px;        /* horizontal padding for smaller screens */
       box-sizing: border-box;
