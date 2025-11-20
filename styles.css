@@ -774,13 +774,41 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
-    /* Optional: smoother scrolling for nicer UX */
+    /* Make scrollbars visible inside these containers */
     .assoc-stack::-webkit-scrollbar,
     .stack::-webkit-scrollbar,
     .aboutme-overlay::-webkit-scrollbar,
     .sa-overlay-card::-webkit-scrollbar {
+      display: block !important;
       width: 8px;
     }
+
+    /* Track */
+    .assoc-stack::-webkit-scrollbar-track,
+    .stack::-webkit-scrollbar-track,
+    .aboutme-overlay::-webkit-scrollbar-track,
+    .sa-overlay-card::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+    }
+
+    /* Thumb */
+    .assoc-stack::-webkit-scrollbar-thumb,
+    .stack::-webkit-scrollbar-thumb,
+    .aboutme-overlay::-webkit-scrollbar-thumb,
+    .sa-overlay-card::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 4px;
+    }
+
+    /* Hover thumb */
+    .assoc-stack::-webkit-scrollbar-thumb:hover,
+    .stack::-webkit-scrollbar-thumb:hover,
+    .aboutme-overlay::-webkit-scrollbar-thumb:hover,
+    .sa-overlay-card::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.55);
+    }
+
 
 
     /* only this one */
