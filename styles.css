@@ -655,8 +655,7 @@
       background-image: url("images/PA-Images/Charity_bg.png"); /* update path */
       background-repeat: repeat;
       background-size: 1920px auto;
-      mix-blend-mode: multiply;
-      filter: contrast(0.95) brightness(3.5);
+      filter: contrast(0.95) brightness(0.5);
     }
 
     .charity-content {
