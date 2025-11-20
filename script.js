@@ -224,6 +224,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // init
     renderPage(1);
 
+    function resetCharityOverlayState() {
+      renderPage(1);
+      const stack = document.getElementById('charity-stack');
+      if (stack) stack.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    function resetAssocOverlayState() {
+      const assocStack = document.querySelector('#associations-overlay .assoc-stack');
+      if (assocStack) assocStack.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    window.resetCharityOverlayState = resetCharityOverlayState;
+    window.resetAssocOverlayState   = resetAssocOverlayState;
 
 /* ------------------------------------------
    READ MORE / READ LESS + MEDIA CAROUSEL + DOTS
@@ -666,6 +679,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!card.classList.contains('expanded')) stopAuto();
       });
     });
+    
 
     function resetAllExpandableCards() {
       // CHARITY CARDS
@@ -705,7 +719,13 @@ document.addEventListener('DOMContentLoaded', function () {
       navLinks.forEach(link => {
         link.addEventListener('click', () => {
           allOverlays.forEach(ov => ov.classList.remove('is-visible'));
+
+          // collapse cards + toggles
           resetAllExpandableCards();
+
+          // reset pagination + scroll to top for overlays
+          if (window.resetCharityOverlayState) window.resetCharityOverlayState();
+          if (window.resetAssocOverlayState)   window.resetAssocOverlayState();
         });
       });
     });
@@ -722,10 +742,14 @@ document.addEventListener('DOMContentLoaded', function () {
       );
       if (innerCard) return;
 
-      // Otherwise, clicked on the backdrop (bg image / empty area) → close
-      overlay.classList.remove("is-visible");
-      resetAllExpandableCards();
-    });
+        // Otherwise, clicked on the backdrop → close
+        overlay.classList.remove("is-visible");
+
+        // reset cards (charity + assoc), and overlays’ scroll/page
+        resetAllExpandableCards();
+        if (window.resetCharityOverlayState) window.resetCharityOverlayState();
+        if (window.resetAssocOverlayState)   window.resetAssocOverlayState();
+      });
 
 
     // Function to trigger hero animations
@@ -810,7 +834,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let isDragging      = false;
   let dragStartX      = 0;
   let dragOffsetStart = 0;
-  let hasDragged      = false;   // to detect click vs drag
+  let hasDragged      = false;  
 
   // ----------------------------------------------------
   // POSITION BUBBLES
@@ -997,9 +1021,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ----------------------------------------------------
-  // INIT
-  // ----------------------------------------------------
   layoutBubbles();
   updateCenterHighlight();
   animID = requestAnimationFrame(loop);
@@ -1084,7 +1105,6 @@ document.addEventListener("DOMContentLoaded", () => {
     </ul>
   `
   lightbox.appendChild(shareMenu);
-
 
   /* -----------------------------
       OPEN LIGHTBOX ON IMAGE CLICK
