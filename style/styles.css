@@ -315,7 +315,7 @@
 
     .hero-name {
       font-weight: 500;
-      font: normal normal normal 90px/115px "Balerno Serif", serif;
+      font: normal normal normal 130px/185px "Balerno Serif", serif;
       line-height: 1.1;
       letter-spacing: 0.02em;
     }
@@ -338,7 +338,7 @@
         width: clamp(600px, 36vw, 800px); /* Adjust the max-width of the portrait */
       }
       .hero-name {
-        font-size: 6.5rem; /* Larger text on big screens */
+        font-size: 7rem; /* Larger text on big screens */
       }
 
       .hero-role {
