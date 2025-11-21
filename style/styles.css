@@ -1892,13 +1892,11 @@
       animation: heroSlideFromLeft 0.9s ease-out forwards;
     }
 
-
     footer {
       padding: 20px;
       text-align: center;
-      font-size: 13px;
-      color: #777;
-      background: #111;
+      font-size: 15px;
+      background: #000000;
       color: #eee;
     }
     
