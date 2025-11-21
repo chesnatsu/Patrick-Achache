@@ -106,8 +106,12 @@
     .nav-left,
     .nav-right {
       display: flex;
-      gap: 150px;
+      gap: 130px;
       align-items: center;
+    }
+    .nav-right{
+      position: relative;
+      right: 40px;
     }
 
     .nav-link:hover,
