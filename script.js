@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const saItems = document.querySelectorAll("#associations .sa-item");
     saItems.forEach((item, index) => {
       const itemIndex = index + 1;
-      triggerAnimation(item, [1,2,4].includes(itemIndex) ? "left" : "right");
+      triggerAnimation(item, [1,2,4,5].includes(itemIndex) ? "left" : "right");
     });
   });
 
