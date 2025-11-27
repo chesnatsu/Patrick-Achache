@@ -743,8 +743,6 @@ document.addEventListener('DOMContentLoaded', function () {
       if (heroContent) triggerAnimation(heroContent, "left");
       if (heroText) triggerAnimation(heroText, "right");
     }
-    const heroImg = new Image();
-    heroImg.src = "images/PA-Images/PA.png";
 
     function revealSectionsInOrder() {
       const order = [
@@ -772,13 +770,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function hideLoaderAndStartSequence() {
       const loader = document.getElementById("loader");
       if (!loader || loader.classList.contains("fade-out")) return;
-
       loader.classList.add("fade-out");
 
-      // Start the section reveal animation
       revealSectionsInOrder();
-
-      // Also trigger your hero animation
       animateHero();
     }
 
@@ -791,8 +785,6 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener("load", () => {
       setTimeout(hideLoaderAndStartSequence, 1200);
     });
-
-
 
     // NAV LINK CLICK
     document.querySelector('[href="#home"]').addEventListener("click", () => {
