@@ -6,7 +6,6 @@ document.getElementById("year").textContent = new Date().getFullYear();
 
 function triggerAnimation(element, direction = "left") {
   if (!element) return;
-
   const classMap = {
     left: "animate-from-left",
     right: "animate-from-right",
@@ -26,14 +25,12 @@ function triggerAnimation(element, direction = "left") {
 
   // Force reflow so the animation restarts
   void element.offsetWidth;
-
-  element.classList.add(cls);
-
-  element.addEventListener(
-    "animationend",
-    () => element.classList.remove(cls),
-    { once: true }
-  );
+    element.classList.add(cls);
+    element.addEventListener(
+      "animationend",
+      () => element.classList.remove(cls),
+      { once: true }
+    );
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -50,7 +47,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // --- Navigation Link Animations ---
   document.querySelector('[href="#home"]').addEventListener("click", () => {
     animateHero();
   });
@@ -103,13 +99,12 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!cards.length || !pagerRoot) return;
 
     const totalPages = Math.ceil(cards.length / perPage);
-    let currentPage  = 1; // 1-based
+    let currentPage  = 1; 
 
     function renderPage(page) {
       if (page < 1) page = 1;
       if (page > totalPages) page = totalPages;
       currentPage = page;
-
       const start = (page - 1) * perPage;
       const end   = start + perPage;
 
@@ -117,10 +112,8 @@ document.addEventListener('DOMContentLoaded', function () {
         card.style.display = (index >= start && index < end) ? "" : "none";
       });
 
-      // rebuild pager to reflect current page, arrows, ellipses
       buildPager();
 
-      // scroll top of stack when changing page
       const stack = document.getElementById('charity-stack');
       if (stack) {
         stack.scrollTo({ top: 0, behavior: 'smooth' });
@@ -130,8 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function buildPager() {
       pagerRoot.innerHTML = "";
       if (totalPages <= 1) return;
-
-      const MAX_VISIBLE = 3; // how many numeric buttons (excluding first/last) we try to show
+      const MAX_VISIBLE = 3; 
 
       function createPageBtn(pageNum) {
         const btn = document.createElement('button');
@@ -150,9 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'charity-page-btn charity-page-btn--arrow';
-
         btn.innerHTML = direction === 'prev' ? '&lsaquo;' : '&rsaquo;';
-
         const target = direction === 'prev' ? currentPage - 1 : currentPage + 1;
         const disabled =
           (direction === 'prev' && currentPage === 1) ||
@@ -177,17 +167,14 @@ document.addEventListener('DOMContentLoaded', function () {
       // PREV ARROW
       pagerRoot.appendChild(createArrowBtn('prev'));
 
-      // If total pages small: show all
       if (totalPages <= MAX_VISIBLE + 2) {
         for (let i = 1; i <= totalPages; i++) {
           pagerRoot.appendChild(createPageBtn(i));
         }
       } else {
-        // Always show first and last
         const firstPage = 1;
         const lastPage  = totalPages;
 
-        // Middle window around current page
         let start = currentPage - 1;
         let end   = currentPage + 1;
 
@@ -199,10 +186,8 @@ document.addEventListener('DOMContentLoaded', function () {
           start = end - (MAX_VISIBLE - 1);
         }
 
-        // 1
         pagerRoot.appendChild(createPageBtn(firstPage));
 
-        // left ellipsis
         if (start > 2) addEllipsis();
 
         // middle pages
@@ -221,7 +206,6 @@ document.addEventListener('DOMContentLoaded', function () {
       pagerRoot.appendChild(createArrowBtn('next'));
     }
 
-    // init
     renderPage(1);
 
     function resetCharityOverlayState() {
@@ -246,7 +230,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const extra  = card.querySelector('.charity-extra-wrapper');
     const videoSlide = card.querySelector('.video-wrapper');
 
-    // carousel parts
     const slides = card.querySelectorAll('.media-slide');
     const prev   = card.querySelector('.media-prev');
     const next   = card.querySelector('.media-next');
@@ -259,10 +242,10 @@ document.addEventListener('DOMContentLoaded', function () {
     let dots = [];
     let dotsWrap = null;
 
-    if (slides.length >= 2) { // Show dots if there are 2 or more images
+    if (slides.length >= 2) {
       dotsWrap = document.createElement('div');
       dotsWrap.className = 'media-dots';
-      dotsWrap.style.display = 'none'; // only visible when expanded
+      dotsWrap.style.display = 'none';
 
       slides.forEach((_slide, i) => {
         const dot = document.createElement('div');
@@ -761,17 +744,53 @@ document.addEventListener('DOMContentLoaded', function () {
       if (heroText) triggerAnimation(heroText, "right");
     }
 
-    // PAGE LOAD
-    window.addEventListener("load", () => {
+    function revealSectionsInOrder() {
+      const order = [
+        'home',
+        'about',
+        'charity',
+        'associations',
+        'contact'
+      ];
+
+      let delay = 0;
+
+      order.forEach((key, index) => {
+        const section = document.querySelector(`[data-section="${key}"]`);
+        if (!section) return;
+
+        setTimeout(() => {
+          section.classList.add('section-visible');
+        }, delay);
+
+        delay += 400; // spacing between reveals
+      });
+    }
+
+    function hideLoaderAndStartSequence() {
       const loader = document.getElementById("loader");
+      if (!loader || loader.classList.contains("fade-out")) return;
 
-      setTimeout(() => {
-        loader.classList.add("fade-out");
+      loader.classList.add("fade-out");
 
-        // Animate hero after loader
-        animateHero();
-      }, 100);
+      // Start the section reveal animation
+      revealSectionsInOrder();
+
+      // Also trigger your hero animation
+      animateHero();
+    }
+
+    // Fast reveal on DOM ready
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(hideLoaderAndStartSequence, 400);
     });
+
+    // Fallback if images or fonts are slow
+    window.addEventListener("load", () => {
+      setTimeout(hideLoaderAndStartSequence, 1200);
+    });
+
+
 
     // NAV LINK CLICK
     document.querySelector('[href="#home"]').addEventListener("click", () => {
@@ -784,16 +803,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
       overlayEl.classList.add("is-visible");
 
-      // Add a history entry so Back/Forward stays on the same page,
-      // but triggers a popstate event we can react to.
       try {
         history.pushState(
           { overlay: overlayEl.id || true },
           "",
-          window.location.href  // keep same URL
+          window.location.href  
         );
       } catch (err) {
-        // fail silently if history is blocked
       }
     }
 
@@ -823,9 +839,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!track || bubbles.length === 0) return;
 
-  const SPACING = 300;   // distance between bubble centers
-  const SPEED   = 40;    // auto slide speed (px/sec)
-
+  const SPACING = 300;  
+  const SPEED   = 40;    
   let baseOffset   = 0;
   let lastTime     = null;
   let animID       = null;
@@ -846,8 +861,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     bubbles.forEach((bubble, i) => {
       let logicalX = i * SPACING + baseOffset;
-
-      // infinite loop wrap
       let wrapped =
         ((logicalX % totalWidth) + totalWidth) % totalWidth - totalWidth / 2;
 
@@ -862,10 +875,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateCenterHighlight() {
     const trackRect   = track.getBoundingClientRect();
     const centerPoint = trackRect.left + trackRect.width / 2;
-
     let closest     = null;
     let closestDist = Infinity;
-
     bubbles.forEach((bubble) => {
       const rect         = bubble.getBoundingClientRect();
       const bubbleCenter = rect.left + rect.width / 2;
@@ -888,17 +899,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!lastTime) lastTime = timestamp;
     const dt = (timestamp - lastTime) / 1000;
     lastTime = timestamp;
-
     if (!isDragging) {
-      baseOffset -= SPEED * dt; // move left
+      baseOffset -= SPEED * dt; 
     }
 
     const totalWidth = SPACING * bubbles.length;
     if (baseOffset <= -totalWidth) baseOffset += totalWidth;
-
     layoutBubbles();
     updateCenterHighlight();
-
     animID = requestAnimationFrame(loop);
   }
 
@@ -924,7 +932,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // ----------------------------------------------------
   function dragMove(clientX) {
     if (!isDragging) return;
-
     const delta = clientX - dragStartX;
     if (Math.abs(delta) > 5) {
       hasDragged = true;
@@ -941,12 +948,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // ----------------------------------------------------
   function dragEnd() {
     if (!isDragging) return;
-
     isDragging = false;
     track.classList.remove("is-dragging");
-
-    lastTime = null;
-    animID   = requestAnimationFrame(loop);
+      lastTime = null;
+      animID   = requestAnimationFrame(loop);
   }
 
   // ----------------------------------------------------
@@ -1004,7 +1009,7 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       e.stopPropagation();
 
-      baseOffset += SPACING;        // move bubbles to the right (show previous)
+      baseOffset += SPACING;  
       layoutBubbles();
       updateCenterHighlight();
     });
@@ -1015,7 +1020,7 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       e.stopPropagation();
 
-      baseOffset -= SPACING;        // move bubbles to the left (show next)
+      baseOffset -= SPACING;       
       layoutBubbles();
       updateCenterHighlight();
     });
@@ -1119,13 +1124,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let sourceEl = el;
 
-      // If it’s a carousel slide, always use the active one
       if (el.classList.contains("media-slide")) {
         const active = el.parentElement.querySelector(".media-slide.is-active");
         if (active) sourceEl = active;
       }
 
-      // Get the actual image source
       let src = sourceEl.src;
       const inner = sourceEl.querySelector("img, video");
       if (!src && inner) src = inner.src;

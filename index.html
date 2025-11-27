@@ -4,7 +4,7 @@
   
   <meta charset="UTF-8" />
   <title>Patrick Achache</title>
-  <link rel="icon" type="image/png" href="images/PA-Images/PALogo4.png">
+  <link rel="icon" type="image/png" href="images/PA-Images/NEWPALogo.png">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,7 +28,7 @@
       </nav>
 
       <a href="#home" class="nav-center" aria-label="PA logo">
-        <img src="images/PA-Images/PALogo4.png" alt="PA Logo" class="logo-img" />
+        <img src="images/PA-Images/NEWPALogo.png" alt="PA Logo" class="logo-img" />
       </a>
 
       <nav class="nav-right">
@@ -40,7 +40,7 @@
 
   <main>
     <!-- HERO -->
-    <section id="home" class="hero">
+    <section id="home" class="hero" data-section="home">
       <img class="hero-bg" src="images/PA-Images/Buildings.png" alt="" />
 
       <div class="hero-content">
@@ -54,7 +54,7 @@
     </section>
 
       <!-- ABOUT SECTION (always visible) -->
-      <section id="about" class="about container">
+      <section id="about" class="about container" data-section="about">
         <div class="about-main">
           <div class="copy animate-hidden">
             <h1 class="display title">About</h1>
@@ -120,7 +120,7 @@
       </section>
 
     <!-- CHARITY SUMMARY -->
-    <section id="charity" class="charity">
+    <section id="charity" class="charity" data-section="charity">
       <div class="pattern"></div>
 
       <div class="container charity-content">
@@ -3410,7 +3410,7 @@
       </section>
 
     <!-- SUPPORTED ASSOCIATIONS -->
-    <section id="associations" class="sa">
+    <section id="associations" class="sa" data-section="associations">
       <div class="pattern"></div>
 
       <div class="container sa-content">
@@ -3472,7 +3472,7 @@
           </div>
           <!--ITEM 7-->
           <div class="sa-item">
-            <img src="images/PA-Images/children.png" alt="Children Helping" />
+            <img src="images/PA-Images/children.png" alt="Support" />
             <div class="sa-hover">
               <span class="sa-readmore js-sa-open" data-assoc="children">Read more</span>
             </div>
@@ -4001,12 +4001,17 @@
              <div class="media-inner">
                   <!-- SLIDE 1 -->
                   <img
-                    src="images/PA-Images/children.png" alt="Children Helping"
+                    src="images/PA-Images/children.png" alt="Support"
                     class="media-slide is-active"
                   />
-                  <!-- SLIDE 1 -->
+                  <!-- SLIDE 2 -->
                   <img
-                    src="images/PA-Images/children1.png" alt="Children Helping"
+                    src="images/PA-Images/children1.png" alt="Support"
+                    class="media-slide is-active"
+                  />
+                  <!-- SLIDE 3 -->
+                  <img
+                    src="images/PA-Images/children3.png" alt="Support"
                     class="media-slide is-active"
                   />
 
@@ -4144,7 +4149,7 @@
     </section>
 
     <!-- CONTACT -->
-    <section id="contact" class="contact">
+    <section id="contact" class="contact" data-section="contact">
       <div class="pattern"></div>
 
       <div class="contact-grid container">
