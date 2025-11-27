@@ -763,7 +763,7 @@ document.addEventListener('DOMContentLoaded', function () {
           section.classList.add('section-visible');
         }, delay);
 
-        delay += 400; // spacing between reveals
+        delay += 400; 
       });
     }
 
