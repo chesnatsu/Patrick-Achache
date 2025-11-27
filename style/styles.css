@@ -136,7 +136,7 @@
     }
 
     .logo-img {
-      height: 50px;
+      height: 80px;
       width: auto;
       object-fit: contain;
     }
@@ -1252,7 +1252,7 @@
     /* BOTTOM ROW — 3 items */
     .sa-grid-bottom {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
       padding: 5px;
       margin-bottom: 35px;
