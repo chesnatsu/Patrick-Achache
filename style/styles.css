@@ -302,6 +302,8 @@
       align-self: flex-end;
       margin-left: -8vh;
       filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.35));
+      opacity: 0;
+      transition: opacity 0.8s ease, transform 0.8s ease;
     }
 
     .hero-text {
@@ -327,7 +329,7 @@
       color: #FFFFFF;
       text-align: center;
     }
-    /* For larger devices (e.g., desktop) */
+
     @media (min-width: 1200px) {
       .hero {
         height: calc(100vh - var(--navbar-height));

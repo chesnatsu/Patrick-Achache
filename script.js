@@ -744,6 +744,9 @@ document.addEventListener('DOMContentLoaded', function () {
       if (heroText) triggerAnimation(heroText, "right");
     }
 
+    const heroImg = new Image();
+    heroImg.src = "images/PA-Images/PA.png";
+
     function revealSectionsInOrder() {
       const order = [
         'home',
@@ -761,11 +764,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
         setTimeout(() => {
           section.classList.add('section-visible');
+
+          // Immediately reveal hero portrait if this is the home section
+          if (key === 'home') {
+            const heroPortrait = section.querySelector('.hero-portrait');
+            if (heroPortrait) {
+              heroPortrait.style.opacity = 1; 
+              heroPortrait.style.transform = 'translateY(0)'; 
+            }
+          }
+
         }, delay);
 
-        delay += 400; 
+        delay += 400;
       });
     }
+
 
     function hideLoaderAndStartSequence() {
       const loader = document.getElementById("loader");
