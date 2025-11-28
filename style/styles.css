@@ -94,7 +94,7 @@
       width: 100%;  
       background: #ffffff;
       max-width: 100%;
-       z-index: 9999;  
+      z-index: 999;  
     }
 
     .nav-bar {
@@ -642,23 +642,25 @@
       box-shadow: 0 18px 40px rgba(0,0,0,0.18);
     }
 
-
-    /* Left portrait container */
     .aboutme-inner .photo {
       border-radius: 16px 16px 0 0;
       background-color: #1e1e1e;
-      height: 108.8%;
+      height: 108.9%;
       display: flex;
       align-items: flex-end;
+      justify-content: center; 
+      overflow: hidden; 
     }
-
-    /* Portrait image */
     .aboutme-inner .photo img {
-      max-width: 110%;
-      height: auto;  
+      width: clamp(250px, 42vw, 600px);
+      height: 85%;
       object-fit: center;
+      object-position: center;
+      padding-left: 9%;
+      transform: scale(1.15);   
+      transition: transform 0.4s ease; 
     }
-
+ 
     /* Title styling */
     .aboutme-inner .title {
       font: normal normal normal 60px/72px "Balerno Serif", serif;
