@@ -94,7 +94,7 @@
       width: 100%;  
       background: #ffffff;
       max-width: 100%;
-      z-index: 999;  
+      z-index: 9999;  
     }
 
     .nav-bar {
