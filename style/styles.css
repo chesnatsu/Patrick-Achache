@@ -1,6 +1,6 @@
 
     :root {
-      --navbar-height: 73px;
+      --navbar-height: 80px;
       --gold: #a8957b;
       --bg-dark: #1f1a14;
       --font-body: "Oxygen", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -18,6 +18,8 @@
       font-family: 'Oxygen', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #f8f8f8;
       color: #111;
+      margin: 0;
+      padding-top: var(--navbar-height); 
       line-height: 1.6;
     }
 
@@ -81,15 +83,18 @@
       font-family: var(--font-display);
     }
 
+
     /* NAVBAR -------------------------------------------------- */
 
+
     .nav-wrap {
-      position: sticky;
+      position: fixed;      /* or sticky, depending on your layout */
       top: 0;
-      left: 0px;
-      z-index: 2000;   
+      left: 0;
+      width: 100%;  
       background: #ffffff;
       max-width: 100%;
+       z-index: 9999;  
     }
 
     .nav-bar {
@@ -121,6 +126,7 @@
     }
     .nav-right {
       justify-content: flex-end;
+      right: -3px;
     }
 
     .nav-center {
@@ -265,13 +271,13 @@
     .hero {
       position: relative;
       height: calc(100vh - var(--navbar-height));
+      margin-top: var(--navbar-height);
       color: #fff;
       display: flex;
       align-items: flex-end;
       justify-content: center;
       overflow: hidden;
-      margin: 0;
-      padding: 0;
+      margin: 0;  
     }
 
     .hero-bg {
@@ -329,56 +335,60 @@
       text-align: center;
     }
 
+    /* Large screens */
     @media (min-width: 1200px) {
       .hero {
         height: calc(100vh - var(--navbar-height));
       }
 
       .hero-portrait {
-        width: clamp(600px, 36vw, 800px);
+        width: clamp(600px, 36vw, 800px); 
       }
+
       .hero-name {
-        font-size: 7rem; 
+        font-size: 6rem; 
       }
 
       .hero-role {
         font-size: 1.1rem; 
       }
     }
+
+    /* Medium screens (e.g. slightly smaller desktops or larger tablets) */
     @media (max-width: 1100px), (max-height: 780px) {
-      .hero {
-        height: calc(100vh - var(--navbar-height)); 
-      }
-
-      .hero-portrait {
-        width: clamp(500px, 36vw, 650px); 
-      }
-      .hero-name {
-        font-size: 5.5rem; 
-      }
-
-      .hero-role {
-        font-size: .9rem; 
-      }
-    }
-
-    /* Stack portrait ABOVE the text on smaller desktops */
-    @media (max-width: 900px), (max-height: 700px) {
       .hero {
         height: calc(100vh - var(--navbar-height));
       }
 
       .hero-portrait {
-        width: clamp(300px, 36vw, 650px); 
+        width: clamp(500px, 36vw, 650px);  
       }
+
       .hero-name {
-        font-size: 4.5rem; 
+        font-size: 5.5rem; 
       }
 
       .hero-role {
-        font-size: .8rem; 
+        font-size: 1rem;  
       }
     }
+
+    /* Stack portrait ABOVE the text on smaller desktops */
+    @media (max-width: 900px), (max-height: 700px)
+      { 
+      .hero {
+        height: calc(100vh - var(--navbar-height)); 
+      }
+      .hero-portrait { 
+        width: clamp(300px, 36vw, 550px); 
+      } 
+      .hero-name {
+        font-size: 4.5rem; 
+      } 
+      .hero-role {
+        font-size: .7rem; 
+      } 
+        }
 
     /* ABOUT VIEW (same look as your Vue version) */
     .about {
@@ -683,7 +693,7 @@
       inset: 0;
       background-image: url("../images/PA-Images/Charity_bg.png"); 
       background-repeat: repeat;
-      background-size: 1920px auto;
+      background-size: 1990px auto;
       filter: contrast(0.95) brightness(0.5);
     }
 
