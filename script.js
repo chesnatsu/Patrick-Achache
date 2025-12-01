@@ -378,47 +378,46 @@
         }
       }
 
-      // expand / collapse, only one open at a time
-      if (toggle && extra) {
-        toggle.style.cursor = "pointer";
+        // expand / collapse, only one open at a time
+        if (toggle && extra) {
+          toggle.style.cursor = "pointer";
 
-toggle.addEventListener("click", e => {
-  e.stopPropagation();
+        toggle.addEventListener("click", e => {
+          e.stopPropagation();
 
-  const isExpanded = card.classList.contains("expanded");
-  const willExpand = !isExpanded;
+          const isExpanded = card.classList.contains("expanded");
+          const willExpand = !isExpanded;
 
-  // Close other cards
-  cards.forEach(otherCard => {
-    if (otherCard === card) return;
-    otherCard.classList.remove("expanded");
-    const otherToggle = qs(".charity-read-toggle", otherCard);
-    if (otherToggle) otherToggle.textContent = "Read more";
+          // Close other cards
+          cards.forEach(otherCard => {
+            if (otherCard === card) return;
+            otherCard.classList.remove("expanded");
+            const otherToggle = qs(".charity-read-toggle", otherCard);
+            if (otherToggle) otherToggle.textContent = "Read more";
 
-    const otherDotsWrap = qs(".media-dots", otherCard);
-    if (otherDotsWrap) otherDotsWrap.style.display = "none";
+            const otherDotsWrap = qs(".media-dots", otherCard);
+            if (otherDotsWrap) otherDotsWrap.style.display = "none";
 
-    // Reset slides to first slide
-    const otherSlides = qsa(".media-slide", otherCard);
-    otherSlides.forEach((slide, i) =>
-      slide.classList.toggle("is-active", i === 0)
-    );
-  });
+            // Reset slides to first slide
+            const otherSlides = qsa(".media-slide", otherCard);
+            otherSlides.forEach((slide, i) =>
+              slide.classList.toggle("is-active", i === 0)
+            );
+          });
 
-  // Toggle current card
-  card.classList.toggle("expanded", willExpand);
-  toggle.textContent = willExpand ? "Read less" : "Read more";
+          // Toggle current card
+          card.classList.toggle("expanded", willExpand);
+          toggle.textContent = willExpand ? "Read less" : "Read more";
 
-  if (dotsWrap) {
-    dotsWrap.style.display = willExpand ? "flex" : "none";
-  }
+          if (dotsWrap) {
+            dotsWrap.style.display = willExpand ? "flex" : "none";
+          }
 
-  // Reset active slide if collapsing
-  if (!willExpand) {
-    showSlide(0);
-  }
-});
-
+          // Reset active slide if collapsing
+          if (!willExpand) {
+            showSlide(0);
+          }
+        });
       }
     });
   }
