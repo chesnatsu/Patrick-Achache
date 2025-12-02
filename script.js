@@ -1209,17 +1209,6 @@
     });
   }
 
-      function sendMail(){
-        let parms = {
-          first : document.getElementById("first").value,
-          last : document.getElementById("last").value,
-          email: document.getElementById("email").value,
-          subject: document.getElementById("subject").value,
-          message: document.getElementById("message").value,
-        }
-        emailjs.send("service_lctmb8o", "template_a0f2ajg",parms)
-          .then(alert("Email has been sent"))
-      }
 
   // ---------------------------------------------------
   // DOM READY / LOAD

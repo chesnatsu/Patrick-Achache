@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Oxygen&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style/styles.css">
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 </head>
 
@@ -4312,7 +4314,7 @@
         </div>
 
         <!-- form only HTML/CSS; hook up to your backend/Formspree later -->
-        <form class="contact-form">
+        <form class="contact-form" onsubmit="sendMail(event)">
           <div class="contact-row">
             <label class="sr-only" for="first">First name</label>
             <input
@@ -4362,7 +4364,7 @@
             placeholder="Input message"
           ></textarea>
 
-          <button type="submit" class="contact-btn">SUBMIT</button>
+          <button type="submit" class="contact-btn" id="contact-btn">SUBMIT</button>
         </form>
       </div>
     </section>
@@ -4370,9 +4372,51 @@
   </main>
 
   <footer>
-   <b>Patrick Achache</b> © <span id="year"></span>. All Rights Reserved.
+     <b>Patrick Achache</b> © <span id="year"></span>. All Rights Reserved.
   </footer>
 
- <script src="script.js"></script>
+
+  <script>
+    (function() {
+      emailjs.init({
+        publicKey: "uelTOKuwbo0YX28lb",
+      });
+    })();
+
+    function sendMail(event) {
+      event.preventDefault();
+
+      const btn = document.getElementById("contact-btn");
+      
+      // Get field values
+      const first = document.getElementById("first").value.trim();
+      const last = document.getElementById("last").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const subject = document.getElementById("subject").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      // Check required fields
+      if (!email || !subject || !message) {
+        return; 
+      }
+
+      btn.textContent = "Submitting...";
+      btn.disabled = true;
+
+      const parms = { first, last, email, subject, message };
+
+      emailjs.send("service_8blvy2j", "template_1m0n517", parms)
+        .then(() => {
+          btn.textContent = "SUBMIT"; 
+          btn.disabled = false;
+          document.querySelector(".contact-form").reset();
+        })
+        .catch((err) => {
+          btn.textContent = "SUBMIT"; 
+          btn.disabled = false;
+          console.error(err);
+        });
+    }
+  </script>
 </body>
 </html>
