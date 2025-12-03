@@ -1,7 +1,11 @@
 (() => {
-  // Set current year
-  const yearEl = document.getElementById("year");
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const yearSpan = document.getElementById("year");
+    if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+      }
+  });
 
   // ---------------------------------------------------
   // HELPERS
