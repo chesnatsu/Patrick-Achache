@@ -148,7 +148,7 @@
       setTimeout(() => {
         if (loader) loader.style.display = "none";
       }, 400); 
-y
+
     revealSectionsInOrder();
   animateHero();
 }
@@ -167,6 +167,7 @@ function unlockScrollAfterAssets() {
     updateScrollLock();
   }
 }
+
 
   // ---------------------------------------------------
   // CHARITY PAGINATION + CARDS
@@ -1234,7 +1235,6 @@ function unlockScrollAfterAssets() {
       }
     });
 
-    // close share menu on outside click
     document.addEventListener("click", () => {
       shareMenu.classList.remove("open");
     });
@@ -1246,7 +1246,6 @@ function unlockScrollAfterAssets() {
   // ---------------------------------------------------
 
   document.addEventListener("DOMContentLoaded", () => {
-    // make sure page-loading is set even if HTML didn't have it
     document.documentElement.classList.add("page-loading");
     document.body.classList.add("page-loading");
 
@@ -1263,11 +1262,9 @@ function unlockScrollAfterAssets() {
     initCompaniesCarousel();
     initLightbox();
 
-    // ✅ Show homepage quickly, but WITHOUT enabling scroll yet
     setTimeout(hideLoaderAndRevealContent, 200);
   });
 
-  // When ALL images & assets are done → enable scrolling
   window.addEventListener("load", () => {
     unlockScrollAfterAssets();
 });
