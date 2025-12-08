@@ -137,9 +137,25 @@
     if (!loader || loader.classList.contains("fade-out")) return;
 
     loader.classList.add("fade-out");
-    revealSectionsInOrder();
-    animateHero();
-  }
+
+    // wait for the fade-out transition (match your CSS duration)
+    setTimeout(() => {
+      // ✅ allow page to scroll normally
+      document.documentElement.classList.remove("page-loading");
+      document.body.classList.remove("page-loading");
+
+      // also ensure overlay scroll-lock logic is in a clean state
+      if (!anyOverlayOpen()) {
+        unlockPageScroll();
+      } else {
+        updateScrollLock();
+      }
+    }, 500); // adjust to match #loader transition time
+
+  revealSectionsInOrder();
+  animateHero();
+}
+
 
   // ---------------------------------------------------
   // CHARITY PAGINATION + CARDS
