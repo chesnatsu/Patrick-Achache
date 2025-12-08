@@ -132,26 +132,24 @@
     });
   }
 
-let contentRevealed = false;
-let scrollUnlocked = false;
+  let contentRevealed = false;
+  let scrollUnlocked = false;
 
-// 1) Hide loader + show homepage, but KEEP SCROLL LOCKED
-function hideLoaderAndRevealContent() {
-  if (contentRevealed) return;
-  contentRevealed = true;
+    // 1) Hide loader + show homepage, but KEEP SCROLL LOCKED
+    function hideLoaderAndRevealContent() {
+      if (contentRevealed) return;
+      contentRevealed = true;
 
-  const loader = qs("#loader");
-  if (loader && !loader.classList.contains("fade-out")) {
-    loader.classList.add("fade-out");
-  }
+      const loader = qs("#loader");
+      if (loader && !loader.classList.contains("fade-out")) {
+        loader.classList.add("fade-out");
+      }
 
-  // wait for fade-out animation only to remove it visually
-  setTimeout(() => {
-    if (loader) loader.style.display = "none";
-  }, 400); // match your #loader transition
-
-  // sections + hero appear quickly
-  revealSectionsInOrder();
+      setTimeout(() => {
+        if (loader) loader.style.display = "none";
+      }, 400); 
+y
+    revealSectionsInOrder();
   animateHero();
 }
 
@@ -160,21 +158,15 @@ function unlockScrollAfterAssets() {
   if (scrollUnlocked) return;
   scrollUnlocked = true;
 
-  // remove the global loading lock
   document.documentElement.classList.remove("page-loading");
   document.body.classList.remove("page-loading");
 
-  // overlay scroll logic
   if (!anyOverlayOpen()) {
     unlockPageScroll();
   } else {
     updateScrollLock();
   }
 }
-
-
-
-
 
   // ---------------------------------------------------
   // CHARITY PAGINATION + CARDS
@@ -1253,31 +1245,31 @@ function unlockScrollAfterAssets() {
   // DOM READY / LOAD
   // ---------------------------------------------------
 
-document.addEventListener("DOMContentLoaded", () => {
-  // make sure page-loading is set even if HTML didn't have it
-  document.documentElement.classList.add("page-loading");
-  document.body.classList.add("page-loading");
+  document.addEventListener("DOMContentLoaded", () => {
+    // make sure page-loading is set even if HTML didn't have it
+    document.documentElement.classList.add("page-loading");
+    document.body.classList.add("page-loading");
 
-  initHistoryOverlayHandling();
-  initNavLinksBehavior();
-  initAboutOverlay();
-  initCharityOverlay();
-  initCharityPagination();
-  initCharityCards();
-  initAssociationsOverlays();
-  initAssocCards();
-  initAutoSlideCarousels();
-  initOverlayBackdropClose();
-  initCompaniesCarousel();
-  initLightbox();
+    initHistoryOverlayHandling();
+    initNavLinksBehavior();
+    initAboutOverlay();
+    initCharityOverlay();
+    initCharityPagination();
+    initCharityCards();
+    initAssociationsOverlays();
+    initAssocCards();
+    initAutoSlideCarousels();
+    initOverlayBackdropClose();
+    initCompaniesCarousel();
+    initLightbox();
 
-  // ✅ Show homepage quickly, but WITHOUT enabling scroll yet
-  setTimeout(hideLoaderAndRevealContent, 200);
-});
+    // ✅ Show homepage quickly, but WITHOUT enabling scroll yet
+    setTimeout(hideLoaderAndRevealContent, 200);
+  });
 
-// When ALL images & assets are done → enable scrolling
-window.addEventListener("load", () => {
-  unlockScrollAfterAssets();
+  // When ALL images & assets are done → enable scrolling
+  window.addEventListener("load", () => {
+    unlockScrollAfterAssets();
 });
 
 })();
