@@ -1,6 +1,6 @@
 
     :root {
-      --navbar-height: 73px;
+      --navbar-height: 80px;
       --gold: #a8957b;
       --bg-dark: #1f1a14;
       --font-body: "Oxygen", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -18,6 +18,8 @@
       font-family: 'Oxygen', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #f8f8f8;
       color: #111;
+      margin: 0;
+      padding-top: var(--navbar-height); 
       line-height: 1.6;
     }
 
@@ -32,41 +34,41 @@
     }
 
     html {
-      -ms-overflow-style: none;  /* IE/Edge */
-      scrollbar-width: none;     /* Firefox */
+      -ms-overflow-style: none; 
+      scrollbar-width: none;    
       scroll-behavior: smooth;
       scroll-padding-top: var(--navbar-height);
     }
 
     html::-webkit-scrollbar {
-      display: none;             /* Chrome/Safari */
+      display: none;       
     }
 
     #loader {
       position: fixed;
-      inset: 0;                    /* top:0; right:0; bottom:0; left:0 */
+      inset: 0;            
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #1f1a14;         /* dark bg behind spinner */
+      background: #1f1a14;      
       z-index: 9999;
       transition: opacity 0.4s ease, visibility 0.4s ease;
     }
 
-    /* This class is added by JS after load */
     #loader.fade-out {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
     }
 
+ 
     /* The spinner circle */
     .spinner {
       width: 56px;
       height: 56px;
       border-radius: 50%;
       border: 4px solid rgba(255, 255, 255, 0.2);
-      border-top-color: #a08060;   /* your requested gold color */
+      border-top-color: #a08060;  
       animation: spin 0.5s linear infinite;
     }
 
@@ -81,15 +83,18 @@
       font-family: var(--font-display);
     }
 
+
     /* NAVBAR -------------------------------------------------- */
 
+
     .nav-wrap {
-      position: sticky;
+      position: fixed;      /* or sticky, depending on your layout */
       top: 0;
-      left: 0px;
-      z-index: 2000;   
+      left: 0;
+      width: 100%;  
       background: #ffffff;
       max-width: 100%;
+      z-index: 8999;  
     }
 
     .nav-bar {
@@ -115,12 +120,13 @@
     }
     .nav-link:hover,
     .nav-link:focus {
-      color: #a08060; /* example accent color on hover */
-      border-bottom-color: #a08060; /* underline appears */
+      color: #a08060; 
+      border-bottom-color: #a08060;
       cursor: pointer;
     }
     .nav-right {
       justify-content: flex-end;
+      right: -3px;
     }
 
     .nav-center {
@@ -178,7 +184,7 @@
     
     .lightbox-backdrop {
       position: absolute;
-      inset: 0; /* top:0; right:0; bottom:0; left:0; */
+      inset: 0; 
       cursor: grab;
       z-index: 1000;
     }
@@ -226,14 +232,14 @@
     .share-menu::before {
       content: "";
       position: absolute;
-      top: -10px; /* moves above menu */
-      right: 18px; /* align with share button */
+      top: -10px;
+      right: 18px; 
       width: 0;
       height: 0;
       border-left: 5px solid transparent;
       border-right: 5px solid transparent;
-      border-bottom: 10px solid white; /* arrow color */
-      filter: drop-shadow(0 -1px 1px rgba(0,0,0,0.15)); /* slight shadow */
+      border-bottom: 10px solid white;
+      filter: drop-shadow(0 -1px 1px rgba(0,0,0,0.15));
     }
 
     .share-menu.open {
@@ -265,13 +271,13 @@
     .hero {
       position: relative;
       height: calc(100vh - var(--navbar-height));
+      margin-top: var(--navbar-height);
       color: #fff;
       display: flex;
       align-items: flex-end;
       justify-content: center;
       overflow: hidden;
-      margin: 0;
-      padding: 0;
+      margin: 0;  
     }
 
     .hero-bg {
@@ -291,18 +297,18 @@
       justify-content: center;
       width: 100%;
       max-width: 2000px;
-
+      gap: 40px;
       box-sizing: border-box;
     }
 
     .hero-portrait {
-      width: clamp(500px, 42vw, 700px); /* Responsive width with a range */
+      width: clamp(500px, 42vw, 700px);
       height: auto;
-      object-fit: contain; /* Maintain aspect ratio without stretching */
+      object-fit: contain; 
       align-self: flex-end;
       margin-left: -8vh;
       filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.35));
-      transition: all 0.3s ease; /* Smooth transition for resizing */
+      transition: opacity 0.8s ease, transform 0.8s ease;
     }
 
     .hero-text {
@@ -328,61 +334,65 @@
       color: #FFFFFF;
       text-align: center;
     }
-    /* For larger devices (e.g., desktop) */
+
+    /* Large screens */
     @media (min-width: 1200px) {
       .hero {
-        height: calc(100vh - var(--navbar-height)); /* Ensure full screen height */
+        height: calc(100vh - var(--navbar-height));
       }
 
       .hero-portrait {
-        width: clamp(600px, 36vw, 800px); /* Adjust the max-width of the portrait */
+        width: clamp(600px, 36vw, 800px); 
       }
+
       .hero-name {
-        font-size: 7rem; /* Larger text on big screens */
+        font-size: 6rem; 
       }
 
       .hero-role {
-        font-size: 1.1rem; /* Larger role font on big screens */
+        font-size: 1.1rem; 
       }
     }
+
+    /* Medium screens (e.g. slightly smaller desktops or larger tablets) */
     @media (max-width: 1100px), (max-height: 780px) {
       .hero {
-        height: calc(100vh - var(--navbar-height)); /* Ensure full screen height */
+        height: calc(100vh - var(--navbar-height));
       }
 
       .hero-portrait {
-        width: clamp(500px, 36vw, 650px); /* Adjust the max-width of the portrait */
+        width: clamp(500px, 36vw, 650px);  
       }
+
       .hero-name {
-        font-size: 5.5rem; /* Larger text on big screens */
+        font-size: 5.5rem; 
       }
 
       .hero-role {
-        font-size: .9rem; /* Larger role font on big screens */
+        font-size: 1rem;  
       }
     }
 
     /* Stack portrait ABOVE the text on smaller desktops */
-    @media (max-width: 900px), (max-height: 700px) {
+    @media (max-width: 900px), (max-height: 700px)
+      { 
       .hero {
-        height: calc(100vh - var(--navbar-height)); /* Ensure full screen height */
+        height: calc(100vh - var(--navbar-height)); 
       }
-
-      .hero-portrait {
-        width: clamp(300px, 36vw, 650px); /* Adjust the max-width of the portrait */
-      }
+      .hero-portrait { 
+        width: clamp(300px, 36vw, 550px); 
+      } 
       .hero-name {
-        font-size: 4.5rem; /* Larger text on big screens */
-      }
-
+        font-size: 4.5rem; 
+      } 
       .hero-role {
-        font-size: .8rem; /* Larger role font on big screens */
-      }
-    }
+        font-size: .7rem; 
+      } 
+        }
 
     /* ABOUT VIEW (same look as your Vue version) */
     .about {
-      position: relative;           /* changed from fixed so page can scroll */
+      position: relative;           
       width: 100vw;
       min-height: 100vh;
       overflow: hidden;
@@ -462,7 +472,7 @@
     .image-stack {
       position: relative;
       width: 100%;
-      height: 600px; /* adjust as needed */
+      height: 600px; 
     }
 
     /* Base styling */
@@ -507,7 +517,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      z-index: -1;         /* behind white cards, but inside overlay */
+      z-index: -1;        
       pointer-events: none;
     }
 
@@ -517,7 +527,7 @@
       right: 0;
       bottom: 0;
       padding-top: calc(var(--navbar-height) + 10px);
-      background: transparent;   /* bg handled by image */
+      background: transparent;  
       overflow-y: auto;
       z-index: 5000;   
       opacity: 0;
@@ -582,7 +592,7 @@
       right: 0;
       bottom: 0;
       padding-top: calc(var(--navbar-height) + 30px);
-      background: #000;   /* bg handled by image */
+      background: #000;  
       overflow-y: auto;
       z-index: 1000;   
       opacity: 0;
@@ -632,23 +642,25 @@
       box-shadow: 0 18px 40px rgba(0,0,0,0.18);
     }
 
-
-    /* Left portrait container */
     .aboutme-inner .photo {
       border-radius: 16px 16px 0 0;
       background-color: #1e1e1e;
-      height: 108.8%;
+      height: 108.9%;
       display: flex;
       align-items: flex-end;
+      justify-content: center; 
+      overflow: hidden; 
     }
-
-    /* Portrait image */
     .aboutme-inner .photo img {
-      max-width: 110%;
-      height: auto;  
-      object-fit: center; /* prevents cropping */
+      width: clamp(250px, 42vw, 600px);
+      height: 85%;
+      object-fit: center;
+      object-position: center;
+      padding-left: 9%;
+      transform: scale(1.15);   
+      transition: transform 0.4s ease; 
     }
-
+ 
     /* Title styling */
     .aboutme-inner .title {
       font: normal normal normal 60px/72px "Balerno Serif", serif;
@@ -681,9 +693,9 @@
     .pattern {
       position: absolute;
       inset: 0;
-      background-image: url("../images/PA-Images/Charity_bg.png"); /* update path */
+      background-image: url("../images/PA-Images/Charity_bg.png"); 
       background-repeat: repeat;
-      background-size: 1920px auto;
+      background-size: 1990px auto;
       filter: contrast(0.95) brightness(0.5);
     }
 
@@ -773,8 +785,8 @@
       border-radius: 20px 20px 0 0;
       padding: 30px;
       max-width: 1402px;
-      height: calc(95vh - var(--navbar-height) - 50px); /* visible height minus navbar + margin */
-      overflow-y: auto; /* scroll vertically if content overflows */
+      height: calc(95vh - var(--navbar-height) - 50px); 
+      overflow-y: auto; 
       overflow-x: hidden;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
@@ -834,13 +846,32 @@
     .assoc-link:hover {
       text-decoration: underline;
     }
-
+    
     .assoc-body p,
     .charity-body p {
       margin: 0 0 12px;
       line-height: 1.6;
       color: #4c4c47;
       font-size: 14px;
+    }
+    
+    .charity-body ul,
+    .charity-extra-wrapper ul,
+    .assoc-body ul,
+    .assoc-extra-wrapper ul {
+      list-style-type: disc;    
+      padding-left: 1.5rem;       
+      margin: 0.5rem 0 1rem 0;   
+    }
+
+    .charity-body li,
+    .charity-extra-wrapper li,
+    .assoc-body li,
+    .assoc-extra-content li{
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
+      font-size: 14px;          
+      color: #4c4c47;
     }
 
     .charity-card,
@@ -854,9 +885,15 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
       transition: all 0.6s cubic-bezier(0.9, 0, 0.2, 1);
     }
+    
+    /* Expanded state: only the body increases padding */
+    .charity-card.expanded .charity-body,
+    .assoc-card.expanded .assoc-body {
+      padding: 0 40px;
+    }
     .contact-link {
       color: red;
-      text-decoration: none; /* optional: remove underline */
+      text-decoration: none; 
     }
     /* base transition */
     .charity-card:not(.expanded) .media img,
@@ -939,6 +976,14 @@
       transform: scale(1.02);
       pointer-events: auto;
     }
+    
+    /* When card is expanded: contain + optional slight zoom-out */
+    .charity-card.expanded .media-slide.is-active,
+    .assoc-card.expanded .media-slide.is-active{
+      object-fit: contain;
+      transform: scale(0.95); /* optional, makes zoom-out effect */
+    }
+
 
     /* carousel arrows (hidden by default) */
     .media-nav {
@@ -1071,7 +1116,7 @@
       letter-spacing: 0.5px;
       border-bottom: 2px solid transparent;
       transition: color 0.3s ease, border-color 0.3s ease;
-      pointer-events: auto; /* card handles the click */
+      pointer-events: auto; 
     }
 
     .charity-card:hover .read {
@@ -1339,11 +1384,10 @@
       overflow: hidden;
     }
 
-    /* background buildings image + dark overlay */
     .companies-bg {
       position: absolute;
       inset: 0;
-      background-image: url("../images/PA-Images/Buildings2.png"); /* update if needed */
+      background-image: url("../images/PA-Images/Buildings2.png"); 
       background-size: cover;
       background-position: center;
       filter: brightness(0.3);
@@ -1384,16 +1428,14 @@
       justify-content: center;
     }
 
-    /* container for moving bubbles */
     .companies-track {
       position: relative;
       margin-bottom: 2%;
       width: 100%;
       height: 450px;
-      overflow: hidden;        /* hides bubbles as they go off-screen */
+      overflow: hidden;       
     }
 
-    /* The circular bubble itself */
     .company-bubble {
       position: absolute;
       top: 50%;
@@ -1413,8 +1455,6 @@
         opacity 0.3s ease,
         filter 0.3s ease;
     }
-
-    /* Make the link fill the bubble */
 
     .companies-track.is-dragging {
       cursor: grabbing !important;
@@ -1461,10 +1501,9 @@
       box-shadow: 0 28px 70px rgba(0, 0, 0, 0.75);
     }
 
-      /* arrows */
     .companies-arrow {
       position: absolute;
-      bottom: 20px; /* Position from the bottom */
+      bottom: 20px; 
       width: 46px;
       height: 46px;
       border-radius: 50%;
@@ -1476,27 +1515,26 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      z-index: 10; /* Ensures buttons are above the bubbles */
+      z-index: 10; 
     }
 
     .companies-arrow--prev {
-      left: 50%; /* Horizontally center */
-      margin-left: -120px; /* Move it 60px to the left to create the gap */
+      left: 50%; 
+      margin-left: -120px; 
     }
 
     .companies-arrow--next {
-      left: 50%; /* Horizontally center */
-       margin-left: 70px; /* Move it 60px to the left to create the gap */
-  /* Move it 60px to the right to create the gap */
+      left: 50%;
+       margin-left: 70px;
     }
 
     .companies-arrow:hover {
-      transform: translateY(-2px); /* Hover effect */
+      transform: translateY(-2px); 
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
 
     .companies-arrow:active {
-      transform: translateY(0); /* Active effect */
+      transform: translateY(0);
       box-shadow: 0 5px 16px rgba(0, 0, 0, 0.4);
     }
 
@@ -1521,7 +1559,7 @@
     /* when card is expanded, reveal */
     .assoc-card.expanded .assoc-extra-wrapper,
     .charity-card.expanded .charity-extra-wrapper {
-      max-height: 1000px; /* big enough for content */
+      max-height: 1000px; 
       opacity: 1;
     }
 
@@ -1534,7 +1572,7 @@
       letter-spacing: 0.5px;
       border-bottom: 2px solid transparent;
       transition: color 0.3s ease, border-color 0.3s ease;
-      pointer-events: auto; /* card handles the click */
+      pointer-events: auto; 
     }
 
     .assoc-card:hover .assoc-read-toggle {
@@ -1543,7 +1581,6 @@
     }
 
     /* SUPPORTED ASSOCIATIONS – INDIVIDUAL OVERLAYS */
-
     .sa-overlay .container {
       position: relative;
       z-index: 1;
@@ -1562,8 +1599,8 @@
       border-radius: 20px 20px 0 0;
       padding: 40px;
       max-width: 1360px;
-      height: calc(90vh - var(--navbar-height) - 40px);/* visible height minus navbar + margin */
-      overflow: auto; /* prevent overflow */
+      height: calc(90vh - var(--navbar-height) - 40px);
+      overflow: auto; 
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
       display: grid;
       grid-template-rows: auto 1fr;
@@ -1578,8 +1615,8 @@
       background: #f5f5f5;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
       grid-row: 1;
-      width: 100%;   /* fill horizontal space */
-      height: 400px; /* set desired height, can be relative like 50% if needed */
+      width: 100%;  
+      height: 400px; 
     }
 
     /* Make image cover the container properly */
@@ -1587,8 +1624,8 @@
       display: block;
       width: 100%;
       height: 100%;
-      object-fit: cover; /* fills container without distortion */
-      object-position: center; /* centers the image */
+      object-fit: cover; 
+      object-position: center; 
     }
 
     /* ALL images */
@@ -1596,7 +1633,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center;  /* default */
+      object-position: center; 
     }
 
     .sa-overlay-body {
@@ -1654,7 +1691,6 @@
     .contact-copy {
       width: 100%;
       margin-bottom: 43%;
-      /* optional: limit width for readability */
       box-sizing: border-box;
     }
 
@@ -1760,7 +1796,6 @@
       GLOBAL SLIDE ANIMATIONS
       =========================== */
 
-    /* BASE (always visible unless animating) */
     [data-anim] {
       opacity: 1;
       transform: none;
@@ -1815,6 +1850,7 @@
       text-align: center;
       font-size: 15px;
       background: #000000;
+      letter-spacing: 1px;
       color: #eee;
     }
     
