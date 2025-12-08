@@ -132,35 +132,47 @@
     });
   }
 
-  let initialLoadDone = false;
+let contentRevealed = false;
+let scrollUnlocked = false;
 
-  function hideLoaderAndStartSequence() {
-    if (initialLoadDone) return;
-    initialLoadDone = true;
+// 1) Hide loader + show homepage, but KEEP SCROLL LOCKED
+function hideLoaderAndRevealContent() {
+  if (contentRevealed) return;
+  contentRevealed = true;
 
-    const loader = qs("#loader");
-    if (loader && !loader.classList.contains("fade-out")) {
-      loader.classList.add("fade-out");
-    }
+  const loader = qs("#loader");
+  if (loader && !loader.classList.contains("fade-out")) {
+    loader.classList.add("fade-out");
+  }
 
-    // Wait for the CSS transition on #loader (0.4s) to complete
-    setTimeout(() => {
-      // ✅ re-enable page scrolling
-      document.documentElement.classList.remove("page-loading");
-      document.body.classList.remove("page-loading");
+  // wait for fade-out animation only to remove it visually
+  setTimeout(() => {
+    if (loader) loader.style.display = "none";
+  }, 400); // match your #loader transition
 
-      // Make sure overlay scroll logic is in a clean state
-      if (!anyOverlayOpen()) {
-        unlockPageScroll();
-      } else {
-        updateScrollLock();
-      }
-    }, 400); // match your #loader transition duration
-
-  // Show + animate sections right away (no extra delay)
+  // sections + hero appear quickly
   revealSectionsInOrder();
   animateHero();
 }
+
+// 2) After ALL assets (images, etc.) are loaded → unlock scroll
+function unlockScrollAfterAssets() {
+  if (scrollUnlocked) return;
+  scrollUnlocked = true;
+
+  // remove the global loading lock
+  document.documentElement.classList.remove("page-loading");
+  document.body.classList.remove("page-loading");
+
+  // overlay scroll logic
+  if (!anyOverlayOpen()) {
+    unlockPageScroll();
+  } else {
+    updateScrollLock();
+  }
+}
+
+
 
 
 
@@ -1241,26 +1253,32 @@
   // DOM READY / LOAD
   // ---------------------------------------------------
 
-  document.addEventListener("DOMContentLoaded", () => {
-    initHistoryOverlayHandling();
-    initNavLinksBehavior();
-    initAboutOverlay();
-    initCharityOverlay();
-    initCharityPagination();
-    initCharityCards();
-    initAssociationsOverlays();
-    initAssocCards();
-    initAutoSlideCarousels();
-    initOverlayBackdropClose();
-    initCompaniesCarousel();
-    initLightbox();
+document.addEventListener("DOMContentLoaded", () => {
+  // make sure page-loading is set even if HTML didn't have it
+  document.documentElement.classList.add("page-loading");
+  document.body.classList.add("page-loading");
 
-    setTimeout(hideLoaderAndStartSequence, 200);
-  });
+  initHistoryOverlayHandling();
+  initNavLinksBehavior();
+  initAboutOverlay();
+  initCharityOverlay();
+  initCharityPagination();
+  initCharityCards();
+  initAssociationsOverlays();
+  initAssocCards();
+  initAutoSlideCarousels();
+  initOverlayBackdropClose();
+  initCompaniesCarousel();
+  initLightbox();
 
-  // slow assets fallback
-  window.addEventListener("load", () => {
-     hideLoaderAndStartSequence();
-  });
+  // ✅ Show homepage quickly, but WITHOUT enabling scroll yet
+  setTimeout(hideLoaderAndRevealContent, 200);
+});
+
+// When ALL images & assets are done → enable scrolling
+window.addEventListener("load", () => {
+  unlockScrollAfterAssets();
+});
+
 })();
 

@@ -32,10 +32,11 @@
       text-decoration: none;
       color: inherit;
     }
-    
+
     html.page-loading,
     body.page-loading {
       overflow: hidden;
+      height: 100%;
     }
 
     html {
