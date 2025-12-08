@@ -1248,13 +1248,12 @@
     initCompaniesCarousel();
     initLightbox();
 
-    // fast reveal fallback
-    setTimeout(hideLoaderAndStartSequence, 400);
+
   });
 
   // slow assets fallback
   window.addEventListener("load", () => {
-    setTimeout(hideLoaderAndStartSequence, 1200);
+     setTimeout(hideLoaderAndStartSequence, 400);
   });
 })();
 
