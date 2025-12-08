@@ -132,29 +132,36 @@
     });
   }
 
+  let initialLoadDone = false;
+
   function hideLoaderAndStartSequence() {
+    if (initialLoadDone) return;
+    initialLoadDone = true;
+
     const loader = qs("#loader");
-    if (!loader || loader.classList.contains("fade-out")) return;
+    if (loader && !loader.classList.contains("fade-out")) {
+      loader.classList.add("fade-out");
+    }
 
-    loader.classList.add("fade-out");
-
-    // wait for the fade-out transition (match your CSS duration)
+    // Wait for the CSS transition on #loader (0.4s) to complete
     setTimeout(() => {
-      // ✅ allow page to scroll normally
+      // ✅ re-enable page scrolling
       document.documentElement.classList.remove("page-loading");
       document.body.classList.remove("page-loading");
 
-      // also ensure overlay scroll-lock logic is in a clean state
+      // Make sure overlay scroll logic is in a clean state
       if (!anyOverlayOpen()) {
         unlockPageScroll();
       } else {
         updateScrollLock();
       }
-    }, 500); // adjust to match #loader transition time
+    }, 400); // match your #loader transition duration
 
+  // Show + animate sections right away (no extra delay)
   revealSectionsInOrder();
   animateHero();
 }
+
 
 
   // ---------------------------------------------------
@@ -1248,12 +1255,12 @@
     initCompaniesCarousel();
     initLightbox();
 
-
+    setTimeout(hideLoaderAndStartSequence, 200);
   });
 
   // slow assets fallback
   window.addEventListener("load", () => {
-     setTimeout(hideLoaderAndStartSequence, 400);
+     hideLoaderAndStartSequence();
   });
 })();
 
