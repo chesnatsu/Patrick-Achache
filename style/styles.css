@@ -108,7 +108,7 @@
       opacity: 0;
       pointer-events: none;
       transform: translateY(-20px);   /* slight slide-in effect */
-      transition: opacity 0.4s ease, transform 0.4s ease;
+      transition: opacity 0.8s ease, transform 0.8s ease;
     }
 
     .nav-bar {
@@ -283,7 +283,6 @@
     /* HERO -------------------------------------------------- */
 
     .hero {
-   
       height: calc(100vh - var(--navbar-height));
       margin-top: var(--navbar-height);
       color: #fff;
