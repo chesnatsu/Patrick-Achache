@@ -1236,7 +1236,7 @@
   // ---------------------------------------------------
 
     doc.addEventListener("DOMContentLoaded", () => {
-      body = doc.body; // <-- ensure body is available now
+      body = doc.body; 
 
       // footer year
       const yearSpan = qs("#year");
