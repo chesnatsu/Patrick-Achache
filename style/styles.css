@@ -283,7 +283,7 @@
     /* HERO -------------------------------------------------- */
 
     .hero {
-      position: relative;
+   
       height: calc(100vh - var(--navbar-height));
       margin-top: var(--navbar-height);
       color: #fff;
