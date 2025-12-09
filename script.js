@@ -1236,7 +1236,7 @@
   // ---------------------------------------------------
 
     doc.addEventListener("DOMContentLoaded", () => {
-      body = doc.body;
+      body = doc.body; // <-- ensure body is available now
 
       // footer year
       const yearSpan = qs("#year");
@@ -1262,5 +1262,6 @@
 
       setTimeout(hideLoaderAndRevealContent, 200);
     });
+
   window.addEventListener("load", unlockScrollAfterAssets);
 })();
