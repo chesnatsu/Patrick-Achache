@@ -1,18 +1,14 @@
 (() => {
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const yearSpan = document.getElementById("year");
-    if (yearSpan) {
-        yearSpan.textContent = new Date().getFullYear();
-      }
-  });
-
   // ---------------------------------------------------
-  // HELPERS
+  // BASIC HELPERS + CONSTANTS
   // ---------------------------------------------------
 
-  const qs = (sel, root = document) => root.querySelector(sel);
-  const qsa = (sel, root = document) => root.querySelectorAll(sel);
+  const doc = document;
+  const docEl = doc.documentElement;
+  let body;
+
+  const qs = (sel, root = doc) => root.querySelector(sel);
+  const qsa = (sel, root = doc) => root.querySelectorAll(sel);
 
   const OVERLAY_SELECTORS = [
     ".aboutme-overlay",
@@ -23,31 +19,36 @@
   ];
   const ALL_OVERLAYS_SELECTOR = OVERLAY_SELECTORS.join(", ");
 
-  function anyOverlayOpen() {
-    return Array.from(qsa(ALL_OVERLAYS_SELECTOR)).some(ov =>
+  let contentRevealed = false;
+  let scrollUnlocked = false;
+
+  // ---------------------------------------------------
+  // SCROLL LOCK / OVERLAY HELPERS
+  // ---------------------------------------------------
+
+  const anyOverlayOpen = () =>
+    Array.from(qsa(ALL_OVERLAYS_SELECTOR)).some(ov =>
       ov.classList.contains("is-visible")
     );
-  }
 
-  function lockPageScroll() {
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-  }
+  const lockPageScroll = () => {
+    docEl.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+  };
 
-  function unlockPageScroll() {
-    if (!anyOverlayOpen()) {
-      document.documentElement.style.overflow = "";
-      document.body.style.overflow = "";
-    }
-  }
+  const unlockPageScroll = () => {
+    if (anyOverlayOpen()) return;
+    docEl.style.overflow = "";
+    body.style.overflow = "";
+  };
 
-  function updateScrollLock() {
+  const updateScrollLock = () => {
     if (anyOverlayOpen()) {
       lockPageScroll();
     } else {
       unlockPageScroll();
     }
-  }
+  };
 
   // Trigger CSS animation on element
   function triggerAnimation(element, direction = "left") {
@@ -132,51 +133,47 @@
     });
   }
 
-  let contentRevealed = false;
-  let scrollUnlocked = false;
+  // ---------------------------------------------------
+  // LOADER + INITIAL SCROLL CONTROL
+  // ---------------------------------------------------
 
-    // 1) Hide loader + show homepage, but KEEP SCROLL LOCKED
-    function hideLoaderAndRevealContent() {
-      if (contentRevealed) return;
-      contentRevealed = true;
+  function hideLoaderAndRevealContent() {
+    if (contentRevealed) return;
+    contentRevealed = true;
 
-      const loader = qs("#loader");
-      if (loader && !loader.classList.contains("fade-out")) {
-        loader.classList.add("fade-out");
-      }
+    const loader = qs("#loader");
+    if (loader && !loader.classList.contains("fade-out")) {
+      loader.classList.add("fade-out");
+    }
 
-      setTimeout(() => {
-        if (loader) loader.style.display = "none";
-      }, 400); 
+    setTimeout(() => {
+      if (loader) loader.style.display = "none";
+    }, 400);
 
     revealSectionsInOrder();
-  animateHero();
-}
-
-// 2) After ALL assets (images, etc.) are loaded → unlock scroll
-function unlockScrollAfterAssets() {
-  if (scrollUnlocked) return;
-  scrollUnlocked = true;
-
-  document.documentElement.classList.remove("page-loading");
-  document.body.classList.remove("page-loading");
-
-  if (!anyOverlayOpen()) {
-    unlockPageScroll();
-  } else {
-    updateScrollLock();
+    animateHero();
   }
-}
 
+  function unlockScrollAfterAssets() {
+    if (scrollUnlocked) return;
+    scrollUnlocked = true;
+
+    docEl.classList.remove("page-loading");
+    body.classList.remove("page-loading");
+
+    if (!anyOverlayOpen()) {
+      unlockPageScroll();
+    } else {
+      updateScrollLock();
+    }
+  }
 
   // ---------------------------------------------------
   // CHARITY PAGINATION + CARDS
   // ---------------------------------------------------
 
   function initCharityPagination() {
-    const cards = Array.from(
-      qsa("#charity-overlay .charity-card")
-    );
+    const cards = Array.from(qsa("#charity-overlay .charity-card"));
     const pagerRoot = qs("#charity-pagination");
     const perPage = 10;
 
@@ -192,7 +189,7 @@ function unlockScrollAfterAssets() {
       const MAX_VISIBLE = 3;
 
       const createPageBtn = pageNum => {
-        const btn = document.createElement("button");
+        const btn = doc.createElement("button");
         btn.type = "button";
         btn.className = "charity-page-btn";
         btn.textContent = pageNum;
@@ -205,7 +202,7 @@ function unlockScrollAfterAssets() {
       };
 
       const createArrowBtn = direction => {
-        const btn = document.createElement("button");
+        const btn = doc.createElement("button");
         btn.type = "button";
         btn.className = "charity-page-btn charity-page-btn--arrow";
         btn.innerHTML = direction === "prev" ? "&lsaquo;" : "&rsaquo;";
@@ -226,7 +223,7 @@ function unlockScrollAfterAssets() {
       };
 
       const addEllipsis = () => {
-        const span = document.createElement("span");
+        const span = doc.createElement("span");
         span.className = "charity-page-ellipsis";
         span.textContent = "…";
         pagerRoot.appendChild(span);
@@ -294,8 +291,7 @@ function unlockScrollAfterAssets() {
     window.resetCharityOverlayState = () => {
       renderPage(1);
       const stack = qs("#charity-stack");
-      if (stack)
-        stack.scrollTo({ top: 0, behavior: "auto" });
+      if (stack) stack.scrollTo({ top: 0, behavior: "auto" });
     };
 
     renderPage(1);
@@ -316,14 +312,13 @@ function unlockScrollAfterAssets() {
       let dotsWrap = null;
       let dots = [];
 
-      // Dots for >=2 slides
       if (slides.length >= 2) {
-        dotsWrap = document.createElement("div");
+        dotsWrap = doc.createElement("div");
         dotsWrap.className = "media-dots";
         dotsWrap.style.display = "none";
 
         slides.forEach((_slide, i) => {
-          const dot = document.createElement("div");
+          const dot = doc.createElement("div");
           dot.className = "media-dot";
           if (i === 0) dot.classList.add("is-active");
           dotsWrap.appendChild(dot);
@@ -352,7 +347,6 @@ function unlockScrollAfterAssets() {
         });
       }
 
-      // slide logic
       function showSlide(index) {
         if (!slides.length) return;
 
@@ -410,9 +404,9 @@ function unlockScrollAfterAssets() {
         }
       }
 
-        // expand / collapse, only one open at a time
-        if (toggle && extra) {
-          toggle.style.cursor = "pointer";
+      // expand / collapse, only one open at a time
+      if (toggle && extra) {
+        toggle.style.cursor = "pointer";
 
         toggle.addEventListener("click", e => {
           e.stopPropagation();
@@ -430,14 +424,12 @@ function unlockScrollAfterAssets() {
             const otherDotsWrap = qs(".media-dots", otherCard);
             if (otherDotsWrap) otherDotsWrap.style.display = "none";
 
-            // Reset slides to first slide
             const otherSlides = qsa(".media-slide", otherCard);
             otherSlides.forEach((slide, i) =>
               slide.classList.toggle("is-active", i === 0)
             );
           });
 
-          // Toggle current card
           card.classList.toggle("expanded", willExpand);
           toggle.textContent = willExpand ? "Read less" : "Read more";
 
@@ -445,7 +437,6 @@ function unlockScrollAfterAssets() {
             dotsWrap.style.display = willExpand ? "flex" : "none";
           }
 
-          // Reset active slide if collapsing
           if (!willExpand) {
             showSlide(0);
           }
@@ -514,12 +505,12 @@ function unlockScrollAfterAssets() {
       let dots = [];
 
       if (slides.length >= 2) {
-        dotsWrap = document.createElement("div");
+        dotsWrap = doc.createElement("div");
         dotsWrap.className = "media-dots";
         dotsWrap.style.display = "none";
 
         slides.forEach((_s, i) => {
-          const dot = document.createElement("div");
+          const dot = doc.createElement("div");
           dot.className = "media-dot";
           if (i === 0) dot.classList.add("is-active");
           dotsWrap.appendChild(dot);
@@ -845,7 +836,7 @@ function unlockScrollAfterAssets() {
   // ---------------------------------------------------
 
   function initOverlayBackdropClose() {
-    document.addEventListener("click", e => {
+    doc.addEventListener("click", e => {
       const overlay = e.target.closest(ALL_OVERLAYS_SELECTOR);
       if (!overlay) return;
 
@@ -1064,11 +1055,11 @@ function unlockScrollAfterAssets() {
     if (!lightboxImg) return;
 
     // toolbar container
-    const controls = document.createElement("div");
+    const controls = doc.createElement("div");
     controls.classList.add("lightbox-controls");
     lightbox.appendChild(controls);
 
-    const zoomBtn = document.createElement("button");
+    const zoomBtn = doc.createElement("button");
     zoomBtn.classList.add("zoom-in-btn");
     zoomBtn.innerHTML = `
       <svg xmlns="http://www.w3.org/2000/svg" width="17" height="20" viewBox="0 -3 26 30" fill="white">
@@ -1076,21 +1067,21 @@ function unlockScrollAfterAssets() {
       </svg>
     `;
 
-    const fullscreenBtn = document.createElement("button");
+    const fullscreenBtn = doc.createElement("button");
     fullscreenBtn.classList.add("fullscreen-btn");
-    fullscreenBtn.innerHTML = "⛶";
+    fullscreenBtn.textContent = "⛶";
 
-    const shareBtn = document.createElement("button");
+    const shareBtn = doc.createElement("button");
     shareBtn.classList.add("share-btn");
-    shareBtn.innerHTML = "↗";
+    shareBtn.textContent = "↗";
 
-    const closeBtn = document.createElement("button");
+    const closeBtn = doc.createElement("button");
     closeBtn.classList.add("lightbox-close");
-    closeBtn.innerHTML = "✕";
+    closeBtn.textContent = "✕";
 
     controls.append(zoomBtn, fullscreenBtn, shareBtn, closeBtn);
 
-    const shareMenu = document.createElement("div");
+    const shareMenu = doc.createElement("div");
     shareMenu.classList.add("share-menu");
     shareMenu.innerHTML = `
       <ul>
@@ -1135,7 +1126,7 @@ function unlockScrollAfterAssets() {
       lightboxImg.src = src;
       lightbox.classList.add("active");
       lockPageScroll();
-      document.body.style.overflow = "hidden";
+      body.style.overflow = "hidden";
     }
 
     function closeLightbox() {
@@ -1143,7 +1134,7 @@ function unlockScrollAfterAssets() {
       unlockPageScroll();
       lightboxImg.style.transform = "scale(1)";
       shareMenu.classList.remove("open");
-      document.body.style.overflow = "";
+      body.style.overflow = "";
     }
 
     // open from media
@@ -1189,10 +1180,10 @@ function unlockScrollAfterAssets() {
     // fullscreen
     fullscreenBtn.addEventListener("click", e => {
       e.stopPropagation();
-      if (!document.fullscreenElement) {
+      if (!doc.fullscreenElement) {
         lightbox.requestFullscreen();
       } else {
-        document.exitFullscreen();
+        doc.exitFullscreen();
       }
     });
 
@@ -1228,46 +1219,49 @@ function unlockScrollAfterAssets() {
           )}`
         );
       } else if (target.dataset.download !== undefined) {
-        const a = document.createElement("a");
+        const a = doc.createElement("a");
         a.href = imgUrl;
         a.download = imgUrl.split("/").pop();
         a.click();
       }
     });
 
-    document.addEventListener("click", () => {
+    doc.addEventListener("click", () => {
       shareMenu.classList.remove("open");
     });
   }
-
 
   // ---------------------------------------------------
   // DOM READY / LOAD
   // ---------------------------------------------------
 
-  document.addEventListener("DOMContentLoaded", () => {
-    document.documentElement.classList.add("page-loading");
-    document.body.classList.add("page-loading");
+    doc.addEventListener("DOMContentLoaded", () => {
+      body = doc.body; 
 
-    initHistoryOverlayHandling();
-    initNavLinksBehavior();
-    initAboutOverlay();
-    initCharityOverlay();
-    initCharityPagination();
-    initCharityCards();
-    initAssociationsOverlays();
-    initAssocCards();
-    initAutoSlideCarousels();
-    initOverlayBackdropClose();
-    initCompaniesCarousel();
-    initLightbox();
+      // footer year
+      const yearSpan = qs("#year");
+      if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+      }
 
-    setTimeout(hideLoaderAndRevealContent, 200);
-  });
+      docEl.classList.add("page-loading");
+      body.classList.add("page-loading");
 
-  window.addEventListener("load", () => {
-    unlockScrollAfterAssets();
-});
+      initHistoryOverlayHandling();
+      initNavLinksBehavior();
+      initAboutOverlay();
+      initCharityOverlay();
+      initCharityPagination();
+      initCharityCards();
+      initAssociationsOverlays();
+      initAssocCards();
+      initAutoSlideCarousels();
+      initOverlayBackdropClose();
+      initCompaniesCarousel();
+      initLightbox();
 
+      setTimeout(hideLoaderAndRevealContent, 200);
+    });
+
+  window.addEventListener("load", unlockScrollAfterAssets);
 })();
-
