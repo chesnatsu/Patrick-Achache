@@ -93,7 +93,7 @@
 
 
     .nav-wrap {
-      position: fixed;      /* or sticky, depending on your layout */
+      position: fixed; 
       top: 0;
       left: 0;
       width: 100%;  
@@ -102,13 +102,15 @@
       opacity: 1;
       transform: translateY(0);
       z-index: 8999;  
+      transition:
+        opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .nav-wrap.nav-hidden {
       opacity: 0;
       pointer-events: none;
-      transform: translateY(-20px);   /* slight slide-in effect */
-      transition: opacity 0.8s ease, transform 0.8s ease;
+      transform: translateY(-40px); 
     }
 
     .nav-bar {
