@@ -638,7 +638,7 @@
       background: #ffffff;
       padding: 50px 60px 0 50px;
       border-radius: 24px 24px 0 0;
-      max-width: 1502px;
+      max-width: 1452px;
       width: 100%;
       min-height: calc(100vh - var(--navbar-height) - 40px);
       overflow-y: hidden;
@@ -669,8 +669,8 @@
     }
 
     .aboutme-inner .title {
-      font: normal normal bold 90px/192px"Balerno Serif", serif;
-      color: #2d2b28;
+      font: normal normal bold 90px/190px"Balerno Serif", serif;
+      color: #434343;
       position: relative;
       letter-spacing: 3.48px;
       top: -20px;
