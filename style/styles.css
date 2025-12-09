@@ -638,7 +638,7 @@
       background: #ffffff;
       padding: 50px 60px 0 50px;
       border-radius: 24px 24px 0 0;
-      max-width: 1400px;
+      max-width: 1502px;
       width: 100%;
       min-height: calc(100vh - var(--navbar-height) - 40px);
       overflow-y: hidden;
@@ -652,7 +652,8 @@
       border-radius: 16px 16px 0 0;
       background-color: #1e1e1e;
       display: flex;
-      align-items: flex-end;     
+      align-items: flex-end;   
+      max-width: 610px;  
       justify-content: center;
       overflow: hidden;
     }
@@ -668,18 +669,20 @@
     }
 
     .aboutme-inner .title {
-      font: normal normal bold 70px/180px "Balerno Serif", serif;
-      padding: 0px 0 0 0;
+      font: normal normal bold 90px/192px"Balerno Serif", serif;
       color: #2d2b28;
+      position: relative;
+      letter-spacing: 3.48px;
+      top: -20px;
     }
 
     .aboutme-inner p {
       margin-bottom: 35px;
-      font-size: 16px;
+      font: normal normal normal 16px/25px Oxygen;
       line-height: 1.7;
-      color: #4c4c47;
+      color: #434343;
       letter-spacing: 0.2px;
-      overflow-wrap: break-word;
+      text-align: left;
     }
 
     /* CHARITY SUMMARY ---------------------------------------- */
