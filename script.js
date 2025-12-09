@@ -132,14 +132,42 @@
     });
   }
 
-  function hideLoaderAndStartSequence() {
-    const loader = qs("#loader");
-    if (!loader || loader.classList.contains("fade-out")) return;
+  let contentRevealed = false;
+  let scrollUnlocked = false;
 
-    loader.classList.add("fade-out");
+    // 1) Hide loader + show homepage, but KEEP SCROLL LOCKED
+    function hideLoaderAndRevealContent() {
+      if (contentRevealed) return;
+      contentRevealed = true;
+
+      const loader = qs("#loader");
+      if (loader && !loader.classList.contains("fade-out")) {
+        loader.classList.add("fade-out");
+      }
+
+      setTimeout(() => {
+        if (loader) loader.style.display = "none";
+      }, 400); 
+
     revealSectionsInOrder();
-    animateHero();
+  animateHero();
+}
+
+// 2) After ALL assets (images, etc.) are loaded → unlock scroll
+function unlockScrollAfterAssets() {
+  if (scrollUnlocked) return;
+  scrollUnlocked = true;
+
+  document.documentElement.classList.remove("page-loading");
+  document.body.classList.remove("page-loading");
+
+  if (!anyOverlayOpen()) {
+    unlockPageScroll();
+  } else {
+    updateScrollLock();
   }
+}
+
 
   // ---------------------------------------------------
   // CHARITY PAGINATION + CARDS
@@ -1207,7 +1235,6 @@
       }
     });
 
-    // close share menu on outside click
     document.addEventListener("click", () => {
       shareMenu.classList.remove("open");
     });
@@ -1219,6 +1246,9 @@
   // ---------------------------------------------------
 
   document.addEventListener("DOMContentLoaded", () => {
+    document.documentElement.classList.add("page-loading");
+    document.body.classList.add("page-loading");
+
     initHistoryOverlayHandling();
     initNavLinksBehavior();
     initAboutOverlay();
@@ -1232,13 +1262,12 @@
     initCompaniesCarousel();
     initLightbox();
 
-    // fast reveal fallback
-    setTimeout(hideLoaderAndStartSequence, 400);
+    setTimeout(hideLoaderAndRevealContent, 200);
   });
 
-  // slow assets fallback
   window.addEventListener("load", () => {
-    setTimeout(hideLoaderAndStartSequence, 1200);
-  });
+    unlockScrollAfterAssets();
+});
+
 })();
 
