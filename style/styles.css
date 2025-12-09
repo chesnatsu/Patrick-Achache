@@ -36,7 +36,6 @@
     html.page-loading,
     body.page-loading {
       overflow: hidden;
-      height: 100%;
     }
 
     html {
@@ -100,7 +99,16 @@
       width: 100%;  
       background: #ffffff;
       max-width: 100%;
+      opacity: 1;
+      transform: translateY(0);
       z-index: 8999;  
+    }
+
+    .nav-wrap.nav-hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-20px);   /* slight slide-in effect */
+      transition: opacity 0.4s ease, transform 0.4s ease;
     }
 
     .nav-bar {
@@ -275,7 +283,7 @@
     /* HERO -------------------------------------------------- */
 
     .hero {
-      position: relative;
+   
       height: calc(100vh - var(--navbar-height));
       margin-top: var(--navbar-height);
       color: #fff;

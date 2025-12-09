@@ -158,6 +158,9 @@
     if (scrollUnlocked) return;
     scrollUnlocked = true;
 
+    const nav = qs(".nav-wrap");
+    if (nav) nav.classList.remove("nav-hidden");
+
     docEl.classList.remove("page-loading");
     body.classList.remove("page-loading");
 
@@ -167,6 +170,7 @@
       updateScrollLock();
     }
   }
+
 
   // ---------------------------------------------------
   // CHARITY PAGINATION + CARDS
