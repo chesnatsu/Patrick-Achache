@@ -1,8 +1,4 @@
 (() => {
-  // ---------------------------------------------------
-  // BASIC HELPERS + CONSTANTS
-  // ---------------------------------------------------
-
   const doc = document;
   const docEl = doc.documentElement;
   let body;
@@ -22,12 +18,8 @@
   let contentRevealed = false;
   let scrollUnlocked = false;
 
-  // ---------------------------------------------------
-  // SCROLL LOCK / OVERLAY HELPERS
-  // ---------------------------------------------------
-
   const anyOverlayOpen = () =>
-    Array.from(qsa(ALL_OVERLAYS_SELECTOR)).some(ov =>
+    [...qsa(ALL_OVERLAYS_SELECTOR)].some(ov =>
       ov.classList.contains("is-visible")
     );
 
@@ -42,119 +34,76 @@
     body.style.overflow = "";
   };
 
-  const updateScrollLock = () => {
-    if (anyOverlayOpen()) {
-      lockPageScroll();
-    } else {
-      unlockPageScroll();
-    }
+  const updateScrollLock = () => (anyOverlayOpen() ? lockPageScroll() : unlockPageScroll());
+
+  const ANIM_CLASSES = [
+    "animate-from-left",
+    "animate-from-right",
+    "animate-from-top",
+    "animate-from-bottom"
+  ];
+
+  const triggerAnimation = (el, dir = "left") => {
+    if (!el) return;
+    const classMap = {
+      left: ANIM_CLASSES[0],
+      right: ANIM_CLASSES[1],
+      top: ANIM_CLASSES[2],
+      bottom: ANIM_CLASSES[3]
+    };
+    const cls = classMap[dir] || classMap.left;
+    el.classList.remove(...ANIM_CLASSES);
+    void el.offsetWidth;
+    el.classList.add(cls);
+    el.addEventListener("animationend", () => el.classList.remove(cls), {
+      once: true
+    });
   };
 
-  // Trigger CSS animation on element
-  function triggerAnimation(element, direction = "left") {
-    if (!element) return;
-
-    const classMap = {
-      left: "animate-from-left",
-      right: "animate-from-right",
-      top: "animate-from-top",
-      bottom: "animate-from-bottom"
-    };
-
-    const cls = classMap[direction] || classMap.left;
-
-    element.classList.remove(
-      "animate-from-left",
-      "animate-from-right",
-      "animate-from-top",
-      "animate-from-bottom"
-    );
-
-    // force reflow so animation can restart
-    void element.offsetWidth;
-
-    element.classList.add(cls);
-    element.addEventListener(
-      "animationend",
-      () => element.classList.remove(cls),
-      { once: true }
-    );
-  }
-
-  // Helper: open overlay + register history entry
-  function showOverlay(overlayEl) {
+  const showOverlay = overlayEl => {
     if (!overlayEl) return;
     overlayEl.classList.add("is-visible");
     updateScrollLock();
-
     try {
-      history.pushState(
-        { overlay: overlayEl.id || true },
-        "",
-        window.location.href
-      );
-    } catch {
-      // ignore history errors
-    }
-  }
+      history.pushState({ overlay: overlayEl.id || true }, "", window.location.href);
+    } catch {}
+  };
 
-  function hideAllOverlays() {
-    qsa(ALL_OVERLAYS_SELECTOR).forEach(ov =>
-      ov.classList.remove("is-visible")
-    );
+  const hideAllOverlays = () => {
+    qsa(ALL_OVERLAYS_SELECTOR).forEach(ov => ov.classList.remove("is-visible"));
     updateScrollLock();
-  }
+  };
 
-  // ---------------------------------------------------
-  // HERO + SECTION REVEAL
-  // ---------------------------------------------------
+  const animateHero = () => {
+    triggerAnimation(qs("#home .hero-content"), "left");
+    triggerAnimation(qs("#home .hero-text"), "right");
+  };
 
-  function animateHero() {
-    const heroContent = qs("#home .hero-content");
-    const heroText = qs("#home .hero-text");
-
-    if (heroContent) triggerAnimation(heroContent, "left");
-    if (heroText) triggerAnimation(heroText, "right");
-  }
-
-  function revealSectionsInOrder() {
-    const order = ["home", "about", "charity", "associations", "contact"];
-    let delay = 0;
-
-    order.forEach(key => {
+  const revealSectionsInOrder = () => {
+    ["home", "about", "charity", "associations", "contact"].forEach((key, i) => {
       const section = qs(`[data-section="${key}"]`);
       if (!section) return;
-
-      setTimeout(() => {
-        section.classList.add("section-visible");
-      }, delay);
-
-      delay += 400;
+      setTimeout(() => section.classList.add("section-visible"), i * 400);
     });
-  }
+  };
 
-  // ---------------------------------------------------
-  // LOADER + INITIAL SCROLL CONTROL
-  // ---------------------------------------------------
-
-  function hideLoaderAndRevealContent() {
+  const hideLoaderAndRevealContent = () => {
     if (contentRevealed) return;
     contentRevealed = true;
 
     const loader = qs("#loader");
     if (loader && !loader.classList.contains("fade-out")) {
       loader.classList.add("fade-out");
+      setTimeout(() => {
+        loader.style.display = "none";
+      }, 400);
     }
-
-    setTimeout(() => {
-      if (loader) loader.style.display = "none";
-    }, 400);
 
     revealSectionsInOrder();
     animateHero();
-  }
+  };
 
-  function unlockScrollAfterAssets() {
+  const unlockScrollAfterAssets = () => {
     if (scrollUnlocked) return;
     scrollUnlocked = true;
 
@@ -164,44 +113,51 @@
     docEl.classList.remove("page-loading");
     body.classList.remove("page-loading");
 
-    if (!anyOverlayOpen()) {
-      unlockPageScroll();
-    } else {
-      updateScrollLock();
-    }
-  }
+    anyOverlayOpen() ? updateScrollLock() : unlockPageScroll();
+  };
 
+  // ---------- CHARITY PAGINATION + CARDS ----------
 
-  // ---------------------------------------------------
-  // CHARITY PAGINATION + CARDS
-  // ---------------------------------------------------
-
-  function initCharityPagination() {
-    const cards = Array.from(qsa("#charity-overlay .charity-card"));
+  const initCharityPagination = () => {
+    const cards = [...qsa("#charity-overlay .charity-card")];
     const pagerRoot = qs("#charity-pagination");
     const perPage = 10;
-
     if (!cards.length || !pagerRoot) return;
 
     const totalPages = Math.ceil(cards.length / perPage);
     let currentPage = 1;
 
-    function buildPager() {
+    const renderPage = page => {
+      page = Math.max(1, Math.min(page, totalPages));
+      currentPage = page;
+
+      const start = (page - 1) * perPage;
+      const end = start + perPage;
+
+      cards.forEach((card, i) => {
+        card.style.display = i >= start && i < end ? "" : "none";
+      });
+
+      buildPager();
+
+      const stack = qs("#charity-stack");
+      if (stack) stack.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const buildPager = () => {
       pagerRoot.innerHTML = "";
       if (totalPages <= 1) return;
 
       const MAX_VISIBLE = 3;
 
-      const createPageBtn = pageNum => {
+      const createPageBtn = n => {
         const btn = doc.createElement("button");
         btn.type = "button";
         btn.className = "charity-page-btn";
-        btn.textContent = pageNum;
-        btn.dataset.page = pageNum;
-        if (pageNum === currentPage) {
-          btn.classList.add("is-active");
-        }
-        btn.addEventListener("click", () => renderPage(pageNum));
+        btn.textContent = n;
+        btn.dataset.page = n;
+        if (n === currentPage) btn.classList.add("is-active");
+        btn.addEventListener("click", () => renderPage(n));
         return btn;
       };
 
@@ -211,8 +167,7 @@
         btn.className = "charity-page-btn charity-page-btn--arrow";
         btn.innerHTML = direction === "prev" ? "&lsaquo;" : "&rsaquo;";
 
-        const target =
-          direction === "prev" ? currentPage - 1 : currentPage + 1;
+        const target = direction === "prev" ? currentPage - 1 : currentPage + 1;
         const disabled =
           (direction === "prev" && currentPage === 1) ||
           (direction === "next" && currentPage === totalPages);
@@ -222,7 +177,6 @@
         } else {
           btn.addEventListener("click", () => renderPage(target));
         }
-
         return btn;
       };
 
@@ -233,65 +187,38 @@
         pagerRoot.appendChild(span);
       };
 
-      // PREV
       pagerRoot.appendChild(createArrowBtn("prev"));
 
       if (totalPages <= MAX_VISIBLE + 2) {
-        for (let i = 1; i <= totalPages; i++) {
-          pagerRoot.appendChild(createPageBtn(i));
-        }
+        for (let i = 1; i <= totalPages; i++) pagerRoot.appendChild(createPageBtn(i));
       } else {
-        const firstPage = 1;
-        const lastPage = totalPages;
+        const first = 1;
+        const last = totalPages;
         let start = currentPage - 1;
         let end = currentPage + 1;
 
         if (start <= 2) {
           start = 2;
           end = start + (MAX_VISIBLE - 1);
-        } else if (end >= lastPage - 1) {
-          end = lastPage - 1;
+        } else if (end >= last - 1) {
+          end = last - 1;
           start = end - (MAX_VISIBLE - 1);
         }
 
-        pagerRoot.appendChild(createPageBtn(firstPage));
-
+        pagerRoot.appendChild(createPageBtn(first));
         if (start > 2) addEllipsis();
 
-        for (let p = start; p <= end && p < lastPage; p++) {
+        for (let p = start; p <= end && p < last; p++) {
           pagerRoot.appendChild(createPageBtn(p));
         }
 
-        if (end < lastPage - 1) addEllipsis();
-        pagerRoot.appendChild(createPageBtn(lastPage));
+        if (end < last - 1) addEllipsis();
+        pagerRoot.appendChild(createPageBtn(last));
       }
 
-      // NEXT
       pagerRoot.appendChild(createArrowBtn("next"));
-    }
+    };
 
-    function renderPage(page) {
-      if (page < 1) page = 1;
-      if (page > totalPages) page = totalPages;
-
-      currentPage = page;
-      const start = (page - 1) * perPage;
-      const end = start + perPage;
-
-      cards.forEach((card, index) => {
-        card.style.display =
-          index >= start && index < end ? "" : "none";
-      });
-
-      buildPager();
-
-      const stack = qs("#charity-stack");
-      if (stack) {
-        stack.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    }
-
-    // expose reset for nav links / overlay close
     window.resetCharityOverlayState = () => {
       renderPage(1);
       const stack = qs("#charity-stack");
@@ -299,10 +226,10 @@
     };
 
     renderPage(1);
-  }
+  };
 
-  function initCharityCards() {
-    const cards = Array.from(qsa("#charity-overlay .charity-card"));
+  const initCharityCards = () => {
+    const cards = [...qsa("#charity-overlay .charity-card")];
 
     cards.forEach(card => {
       const toggle = qs(".charity-read-toggle", card);
@@ -321,7 +248,7 @@
         dotsWrap.className = "media-dots";
         dotsWrap.style.display = "none";
 
-        slides.forEach((_slide, i) => {
+        slides.forEach((_s, i) => {
           const dot = doc.createElement("div");
           dot.className = "media-dot";
           if (i === 0) dot.classList.add("is-active");
@@ -330,20 +257,16 @@
         });
 
         const mediaInner = qs(".media-inner", card);
-        if (mediaInner) {
-          mediaInner.appendChild(dotsWrap);
-        }
+        if (mediaInner) mediaInner.appendChild(dotsWrap);
       }
 
-      // video click-to-play
       if (videoSlide) {
         const video = qs("video", videoSlide);
         const playIcon = qs(".play-icon", videoSlide);
 
         videoSlide.addEventListener("click", e => {
           e.stopPropagation();
-          if (currentIndex !== Array.from(slides).indexOf(videoSlide)) return;
-
+          if (currentIndex !== [...slides].indexOf(videoSlide)) return;
           if (video) {
             video.play();
             if (playIcon) playIcon.style.display = "none";
@@ -351,7 +274,7 @@
         });
       }
 
-      function showSlide(index) {
+      const showSlide = index => {
         if (!slides.length) return;
 
         if (index < 0) index = slides.length - 1;
@@ -359,15 +282,15 @@
         currentIndex = index;
 
         slides.forEach((slide, i) => {
-          const isActive = i === currentIndex;
-          slide.classList.toggle("is-active", isActive);
+          const active = i === currentIndex;
+          slide.classList.toggle("is-active", active);
 
           const video = qs("video", slide);
           const playIcon = qs(".play-icon", slide);
 
           if (!video) return;
 
-          if (isActive) {
+          if (active) {
             video.currentTime = 0;
             video.play();
             if (playIcon) playIcon.style.display = "none";
@@ -383,119 +306,78 @@
             dot.classList.toggle("is-active", i === currentIndex)
           );
         }
-      }
+      };
 
       if (slides.length <= 1) {
         if (prev) prev.style.display = "none";
         if (next) next.style.display = "none";
       } else {
         showSlide(0);
-
-        if (prev) {
+        if (prev)
           prev.addEventListener("click", e => {
             e.stopPropagation();
             e.preventDefault();
             showSlide(currentIndex - 1);
           });
-        }
 
-        if (next) {
+        if (next)
           next.addEventListener("click", e => {
             e.stopPropagation();
             e.preventDefault();
             showSlide(currentIndex + 1);
           });
-        }
       }
 
-      // expand / collapse, only one open at a time
-      if (toggle && extra) {
-        toggle.style.cursor = "pointer";
+      if (!toggle || !extra) return;
 
-        toggle.addEventListener("click", e => {
-          e.stopPropagation();
+      toggle.style.cursor = "pointer";
 
-          const isExpanded = card.classList.contains("expanded");
-          const willExpand = !isExpanded;
+      toggle.addEventListener("click", e => {
+        e.stopPropagation();
+        const willExpand = !card.classList.contains("expanded");
 
-          // Close other cards
-          cards.forEach(otherCard => {
-            if (otherCard === card) return;
-            otherCard.classList.remove("expanded");
-            const otherToggle = qs(".charity-read-toggle", otherCard);
-            if (otherToggle) otherToggle.textContent = "Read more";
-
-            const otherDotsWrap = qs(".media-dots", otherCard);
-            if (otherDotsWrap) otherDotsWrap.style.display = "none";
-
-            const otherSlides = qsa(".media-slide", otherCard);
-            otherSlides.forEach((slide, i) =>
-              slide.classList.toggle("is-active", i === 0)
-            );
-          });
-
-          card.classList.toggle("expanded", willExpand);
-          toggle.textContent = willExpand ? "Read less" : "Read more";
-
-          if (dotsWrap) {
-            dotsWrap.style.display = willExpand ? "flex" : "none";
-          }
-
-          if (!willExpand) {
-            showSlide(0);
-          }
+        cards.forEach(other => {
+          if (other === card) return;
+          other.classList.remove("expanded");
+          const otherToggle = qs(".charity-read-toggle", other);
+          if (otherToggle) otherToggle.textContent = "Read more";
+          const otherDotsWrap = qs(".media-dots", other);
+          if (otherDotsWrap) otherDotsWrap.style.display = "none";
+          qsa(".media-slide", other).forEach((slide, i) =>
+            slide.classList.toggle("is-active", i === 0)
+          );
         });
-      }
+
+        card.classList.toggle("expanded", willExpand);
+        toggle.textContent = willExpand ? "Read less" : "Read more";
+        if (dotsWrap) dotsWrap.style.display = willExpand ? "flex" : "none";
+        if (!willExpand) showSlide(0);
+      });
     });
-  }
+  };
 
-  // ---------------------------------------------------
-  // ASSOCIATIONS (CARDS + SMALL OVERLAYS)
-  // ---------------------------------------------------
+  // ---------- ASSOCIATIONS (CARDS + SMALL OVERLAYS) ----------
 
-  function initAssociationsOverlays() {
+  const initAssociationsOverlays = () => {
     const assocOverlay = qs("#associations-overlay");
     const assocOpen = qs(".js-assoc-open");
 
-    // small individual overlays (js-sa-open)
     qsa(".js-sa-open").forEach(btn => {
       btn.addEventListener("click", e => {
         e.preventDefault();
         e.stopPropagation();
-
-        const key = btn.dataset.assoc;
-        const overlay = qs(`#sa-${key}`);
+        const overlay = qs(`#sa-${btn.dataset.assoc}`);
         if (overlay) showOverlay(overlay);
       });
     });
 
-    // close those small overlays by clicking backdrop
-    qsa(".sa-overlay").forEach(overlay => {
-      overlay.addEventListener("click", e => {
-        if (e.target === overlay) {
-          overlay.classList.remove("is-visible");
-          updateScrollLock();
-        }
-      });
-    });
-
-    // main "view all" overlay
     if (assocOverlay && assocOpen) {
-      assocOpen.addEventListener("click", () => {
-        showOverlay(assocOverlay);
-      });
-
-      assocOverlay.addEventListener("click", e => {
-        if (e.target === assocOverlay) {
-          assocOverlay.classList.remove("is-visible");
-          updateScrollLock();
-        }
-      });
+      assocOpen.addEventListener("click", () => showOverlay(assocOverlay));
     }
-  }
+  };
 
-  function initAssocCards() {
-    const assocCards = Array.from(qsa(".assoc-card"));
+  const initAssocCards = () => {
+    const assocCards = [...qsa(".assoc-card")];
 
     assocCards.forEach(card => {
       const toggle = qs(".assoc-read-toggle", card);
@@ -527,14 +409,11 @@
         });
 
         const mediaInner = qs(".media-inner", card);
-        if (mediaInner) {
-          mediaInner.appendChild(dotsWrap);
-        }
+        if (mediaInner) mediaInner.appendChild(dotsWrap);
       }
 
-      function showSlide(index) {
+      const showSlide = index => {
         if (!slides.length) return;
-
         if (index < 0) index = slides.length - 1;
         if (index >= slides.length) index = 0;
         currentIndex = index;
@@ -542,35 +421,28 @@
         slides.forEach((slide, i) =>
           slide.classList.toggle("is-active", i === currentIndex)
         );
-
-        if (dots.length) {
-          dots.forEach((dot, i) =>
-            dot.classList.toggle("is-active", i === currentIndex)
-          );
-        }
-      }
+        dots.forEach((dot, i) =>
+          dot.classList.toggle("is-active", i === currentIndex)
+        );
+      };
 
       if (slides.length <= 1) {
         if (prev) prev.style.display = "none";
         if (next) next.style.display = "none";
       } else {
         showSlide(0);
-
-        if (prev) {
+        if (prev)
           prev.addEventListener("click", e => {
             e.stopPropagation();
             e.preventDefault();
             showSlide(currentIndex - 1);
           });
-        }
-
-        if (next) {
+        if (next)
           next.addEventListener("click", e => {
             e.stopPropagation();
             e.preventDefault();
             showSlide(currentIndex + 1);
           });
-        }
       }
 
       if (!toggle || !extra) return;
@@ -579,25 +451,18 @@
 
       toggle.addEventListener("click", e => {
         e.stopPropagation();
+        const willExpand = !card.classList.contains("expanded");
 
-        const isExpanded = card.classList.contains("expanded");
-        const willExpand = !isExpanded;
-
-        // close others
-        assocCards.forEach(otherCard => {
-          if (otherCard === card) return;
-          if (!otherCard.classList.contains("expanded")) return;
-
-          otherCard.classList.remove("expanded");
-          const otherToggle = qs(".assoc-read-toggle", otherCard);
+        assocCards.forEach(other => {
+          if (other === card) return;
+          if (!other.classList.contains("expanded")) return;
+          other.classList.remove("expanded");
+          const otherToggle = qs(".assoc-read-toggle", other);
           if (otherToggle) otherToggle.textContent = "Read more";
-
-          const otherDotsWrap = qs(".media-dots", otherCard);
+          const otherDotsWrap = qs(".media-dots", other);
           if (otherDotsWrap) otherDotsWrap.style.display = "none";
-
-          const otherSlides = qsa(".media-slide", otherCard);
-          const otherDots = qsa(".media-dot", otherCard);
-
+          const otherSlides = qsa(".media-slide", other);
+          const otherDots = qsa(".media-dot", other);
           otherSlides.forEach((slide, i) =>
             slide.classList.toggle("is-active", i === 0)
           );
@@ -608,29 +473,20 @@
 
         card.classList.toggle("expanded", willExpand);
         toggle.textContent = willExpand ? "Read less" : "Read more";
-
-        if (dotsWrap) {
-          dotsWrap.style.display = willExpand ? "flex" : "none";
-        }
-
-        if (!willExpand) {
-          showSlide(0);
-        }
+        if (dotsWrap) dotsWrap.style.display = willExpand ? "flex" : "none";
+        if (!willExpand) showSlide(0);
       });
     });
 
-    // for external resets
     const assocStack = qs("#associations-overlay .assoc-stack");
     window.resetAssocOverlayState = () => {
       if (assocStack) assocStack.scrollTo({ top: 0, behavior: "auto" });
     };
-  }
+  };
 
-  // ---------------------------------------------------
-  // AUTO-SLIDE CAROUSEL (charity & assoc cards)
-  // ---------------------------------------------------
+  // ---------- AUTO-SLIDE CAROUSEL (charity & assoc cards) ----------
 
-  function initAutoSlideCarousels() {
+  const initAutoSlideCarousels = () => {
     qsa(".charity-card, .assoc-card").forEach(card => {
       const mediaInner = qs(".media-inner", card);
       if (!mediaInner) return;
@@ -638,7 +494,6 @@
       const slides = qsa(".media-slide", mediaInner);
       const prevBtn = qs(".media-prev", mediaInner);
       const nextBtn = qs(".media-next", mediaInner);
-
       if (slides.length <= 1) return;
 
       let index = 0;
@@ -647,12 +502,9 @@
       const showSlide = i => {
         slides.forEach(s => s.classList.remove("is-active"));
         slides[i].classList.add("is-active");
-
         const dots = qsa(".media-dot", mediaInner);
-        if (dots.length) {
-          dots.forEach(d => d.classList.remove("is-active"));
-          dots[i].classList.add("is-active");
-        }
+        dots.forEach(d => d.classList.remove("is-active"));
+        if (dots[i]) dots[i].classList.add("is-active");
       };
 
       const nextSlide = () => {
@@ -675,32 +527,23 @@
         autoTimer = null;
       };
 
-      if (nextBtn) {
+      if (nextBtn)
         nextBtn.addEventListener("click", () => {
           nextSlide();
           if (card.classList.contains("expanded")) startAuto();
         });
-      }
 
-      if (prevBtn) {
+      if (prevBtn)
         prevBtn.addEventListener("click", () => {
           prevSlide();
           if (card.classList.contains("expanded")) startAuto();
         });
-      }
 
-      const toggleBtn = qs(
-        ".charity-read-toggle, .assoc-read-toggle",
-        card
-      );
+      const toggleBtn = qs(".charity-read-toggle, .assoc-read-toggle", card);
       if (toggleBtn) {
         toggleBtn.addEventListener("click", () => {
           setTimeout(() => {
-            if (card.classList.contains("expanded")) {
-              startAuto();
-            } else {
-              stopAuto();
-            }
+            card.classList.contains("expanded") ? startAuto() : stopAuto();
           }, 50);
         });
       }
@@ -709,20 +552,15 @@
         if (!card.classList.contains("expanded")) stopAuto();
       });
     });
-  }
+  };
 
-  // ---------------------------------------------------
-  // RESET EXPANDABLE CARDS
-  // ---------------------------------------------------
+  // ---------- RESET EXPANDABLE CARDS ----------
 
-  function resetAllExpandableCards() {
+  const resetAllExpandableCards = () => {
     qsa(".charity-card, .assoc-card").forEach(card => {
       card.classList.remove("expanded");
 
-      const toggle = qs(
-        ".charity-read-toggle, .assoc-read-toggle",
-        card
-      );
+      const toggle = qs(".charity-read-toggle, .assoc-read-toggle", card);
       if (toggle) toggle.textContent = "Read more";
 
       const dotsWrap = qs(".media-dots", card);
@@ -738,20 +576,15 @@
         dot.classList.toggle("is-active", i === 0)
       );
     });
-  }
+  };
 
-  // ---------------------------------------------------
-  // NAVIGATION LINKS (close overlays, reset stuff)
-  // ---------------------------------------------------
+  // ---------- NAVIGATION LINKS ----------
 
-  function initNavLinksBehavior() {
-    const navLinks = qsa(".nav-link, .nav-center");
-
-    navLinks.forEach(link => {
+  const initNavLinksBehavior = () => {
+    qsa(".nav-link, .nav-center").forEach(link => {
       link.addEventListener("click", () => {
         hideAllOverlays();
         resetAllExpandableCards();
-
         if (window.resetCharityOverlayState) window.resetCharityOverlayState();
         if (window.resetAssocOverlayState) window.resetAssocOverlayState();
       });
@@ -762,84 +595,40 @@
     const charityLink = qs('[href="#charity"]');
     const assocNavLink = qs('[href="#associations"]');
 
-    if (homeLink) {
-      homeLink.addEventListener("click", () => {
-        animateHero();
-      });
-    }
+    if (homeLink) homeLink.addEventListener("click", animateHero);
 
-    if (aboutLink) {
+    if (aboutLink)
       aboutLink.addEventListener("click", () => {
         triggerAnimation(qs("#about .copy"), "left");
         triggerAnimation(qs("#about .image-stack"), "right");
       });
-    }
 
-    if (charityLink) {
+    if (charityLink)
       charityLink.addEventListener("click", () => {
         triggerAnimation(qs("#charity .charity-content"), "bottom");
       });
-    }
 
-    if (assocNavLink) {
+    if (assocNavLink)
       assocNavLink.addEventListener("click", () => {
-        const saItems = qsa("#associations .sa-item");
-        saItems.forEach((item, index) => {
-          const itemIndex = index + 1;
-          const dir = [1, 2, 4, 5].includes(itemIndex)
-            ? "left"
-            : "right";
+        qsa("#associations .sa-item").forEach((item, i) => {
+          const idx = i + 1;
+          const dir = [1, 2, 3, 5].includes(idx) ? "left" : "right";
           triggerAnimation(item, dir);
         });
       });
-    }
-  }
+  };
 
-  // ---------------------------------------------------
-  // ABOUT & CHARITY OVERLAYS
-  // ---------------------------------------------------
+  // ---------- GENERIC OVERLAY INIT HELPERS ----------
 
-  function initAboutOverlay() {
-    const aboutOverlay = qs("#aboutme-overlay");
-    const aboutOpen = qs(".js-about-open");
+  const initSimpleOverlay = (triggerSel, overlaySel) => {
+    const overlay = qs(overlaySel);
+    const trigger = qs(triggerSel);
+    if (!overlay || !trigger) return;
 
-    if (!aboutOverlay || !aboutOpen) return;
+    trigger.addEventListener("click", () => showOverlay(overlay));
+  };
 
-    aboutOpen.addEventListener("click", () => {
-      showOverlay(aboutOverlay);
-    });
-
-    aboutOverlay.addEventListener("click", e => {
-      if (e.target === aboutOverlay) {
-        aboutOverlay.classList.remove("is-visible");
-        updateScrollLock();
-      }
-    });
-  }
-
-  function initCharityOverlay() {
-    const charityOverlay = qs("#charity-overlay");
-    const charityOpen = qs(".js-charity-open");
-
-    if (!charityOverlay || !charityOpen) return;
-
-    charityOpen.addEventListener("click", () => {
-      showOverlay(charityOverlay);
-    });
-
-    charityOverlay.addEventListener("click", e => {
-      if (e.target === charityOverlay) {
-        charityOverlay.classList.remove("is-visible");
-        updateScrollLock();
-      }
-    });
-  }
-
-  // ---------------------------------------------------
-  // GLOBAL OVERLAY BACKDROP CLICK
-  // ---------------------------------------------------
-
-  function initOverlayBackdropClose() {
+  const initOverlayBackdropClose = () => {
     doc.addEventListener("click", e => {
       const overlay = e.target.closest(ALL_OVERLAYS_SELECTOR);
       if (!overlay) return;
@@ -855,41 +644,32 @@
       if (window.resetCharityOverlayState) window.resetCharityOverlayState();
       if (window.resetAssocOverlayState) window.resetAssocOverlayState();
     });
-  }
+  };
 
-  // ---------------------------------------------------
-  // HISTORY POPSTATE → CLOSE OVERLAYS
-  // ---------------------------------------------------
-
-  function initHistoryOverlayHandling() {
+  const initHistoryOverlayHandling = () => {
     window.addEventListener("popstate", hideAllOverlays);
-  }
+  };
 
-  // ---------------------------------------------------
-  // COMPANIES I WORKED FOR (BUBBLE TRACK)
-  // ---------------------------------------------------
+  // ---------- COMPANIES CAROUSEL ----------
 
-  function initCompaniesCarousel() {
+  const initCompaniesCarousel = () => {
     const track = qs(".companies-track");
-    const bubbles = Array.from(qsa(".company-bubble"));
+    const bubbles = [...qsa(".company-bubble")];
     const prevBtn = qs(".companies-arrow--prev");
     const nextBtn = qs(".companies-arrow--next");
-
     if (!track || !bubbles.length) return;
 
     const SPACING = 300;
     const SPEED = 40;
-
     let baseOffset = 0;
     let lastTime = null;
     let animID = null;
-
     let isDragging = false;
     let dragStartX = 0;
     let dragOffsetStart = 0;
     let hasDragged = false;
 
-    function layoutBubbles() {
+    const layoutBubbles = () => {
       const trackWidth = track.clientWidth;
       const centerX = trackWidth / 2;
       const totalWidth = SPACING * bubbles.length;
@@ -897,44 +677,38 @@
       bubbles.forEach((bubble, i) => {
         const logicalX = i * SPACING + baseOffset;
         const wrapped =
-          ((logicalX % totalWidth) + totalWidth) % totalWidth -
-          totalWidth / 2;
+          ((logicalX % totalWidth) + totalWidth) % totalWidth - totalWidth / 2;
 
-        const x = centerX + wrapped;
-        bubble.style.left = `${x}px`;
+        bubble.style.left = `${centerX + wrapped}px`;
       });
-    }
+    };
 
-    function updateCenterHighlight() {
-      const trackRect = track.getBoundingClientRect();
-      const centerPoint = trackRect.left + trackRect.width / 2;
-
+    const updateCenterHighlight = () => {
+      const rect = track.getBoundingClientRect();
+      const center = rect.left + rect.width / 2;
       let closest = null;
       let closestDist = Infinity;
 
-      bubbles.forEach(bubble => {
-        const rect = bubble.getBoundingClientRect();
-        const bubbleCenter = rect.left + rect.width / 2;
-        const dist = Math.abs(bubbleCenter - centerPoint);
-
-        if (dist < closestDist) {
-          closestDist = dist;
-          closest = bubble;
+      bubbles.forEach(b => {
+        const r = b.getBoundingClientRect();
+        const c = r.left + r.width / 2;
+        const d = Math.abs(c - center);
+        if (d < closestDist) {
+          closestDist = d;
+          closest = b;
         }
       });
 
       bubbles.forEach(b => b.classList.remove("is-center"));
       if (closest) closest.classList.add("is-center");
-    }
+    };
 
-    function loop(timestamp) {
-      if (!lastTime) lastTime = timestamp;
-      const dt = (timestamp - lastTime) / 1000;
-      lastTime = timestamp;
+    const loop = t => {
+      if (!lastTime) lastTime = t;
+      const dt = (t - lastTime) / 1000;
+      lastTime = t;
 
-      if (!isDragging) {
-        baseOffset -= SPEED * dt;
-      }
+      if (!isDragging) baseOffset -= SPEED * dt;
 
       const totalWidth = SPACING * bubbles.length;
       if (baseOffset <= -totalWidth) baseOffset += totalWidth;
@@ -942,59 +716,45 @@
       layoutBubbles();
       updateCenterHighlight();
       animID = requestAnimationFrame(loop);
-    }
+    };
 
-    function dragStart(clientX) {
+    const dragStart = x => {
       isDragging = true;
       hasDragged = false;
-      dragStartX = clientX;
+      dragStartX = x;
       dragOffsetStart = baseOffset;
       track.classList.add("is-dragging");
+      if (animID) cancelAnimationFrame(animID);
+      animID = null;
+    };
 
-      if (animID) {
-        cancelAnimationFrame(animID);
-        animID = null;
-      }
-    }
-
-    function dragMove(clientX) {
+    const dragMove = x => {
       if (!isDragging) return;
-
-      const delta = clientX - dragStartX;
-      if (Math.abs(delta) > 5) {
-        hasDragged = true;
-      }
-
+      const delta = x - dragStartX;
+      if (Math.abs(delta) > 5) hasDragged = true;
       baseOffset = dragOffsetStart + delta;
       layoutBubbles();
       updateCenterHighlight();
-    }
+    };
 
-    function dragEnd() {
+    const dragEnd = () => {
       if (!isDragging) return;
       isDragging = false;
       track.classList.remove("is-dragging");
-
       lastTime = null;
       animID = requestAnimationFrame(loop);
-    }
+    };
 
-    // mouse
-    track.addEventListener("mousedown", e => {
-      dragStart(e.clientX);
-    });
-
+    track.addEventListener("mousedown", e => dragStart(e.clientX));
     bubbles.forEach(bubble => {
       bubble.addEventListener("mousedown", e => {
         e.preventDefault();
         dragStart(e.clientX);
       });
     });
-
     window.addEventListener("mousemove", e => dragMove(e.clientX));
     window.addEventListener("mouseup", dragEnd);
 
-    // touch
     track.addEventListener(
       "touchstart",
       e => dragStart(e.touches[0].clientX),
@@ -1007,7 +767,6 @@
     );
     track.addEventListener("touchend", dragEnd);
 
-    // prevent click-through when dragging
     bubbles.forEach(bubble => {
       const link = qs("a", bubble);
       if (!link) return;
@@ -1019,69 +778,60 @@
       });
     });
 
-    // arrow buttons
-    if (prevBtn) {
+    if (prevBtn)
       prevBtn.addEventListener("click", e => {
         e.preventDefault();
         e.stopPropagation();
-
         baseOffset += SPACING;
         layoutBubbles();
         updateCenterHighlight();
       });
-    }
 
-    if (nextBtn) {
+    if (nextBtn)
       nextBtn.addEventListener("click", e => {
         e.preventDefault();
         e.stopPropagation();
-
         baseOffset -= SPACING;
         layoutBubbles();
         updateCenterHighlight();
       });
-    }
 
     layoutBubbles();
     updateCenterHighlight();
     animID = requestAnimationFrame(loop);
-  }
+  };
 
-  // ---------------------------------------------------
-  // IMAGE LIGHTBOX + TOOLBAR
-  // ---------------------------------------------------
+  // ---------- LIGHTBOX ----------
 
-  function initLightbox() {
+  const initLightbox = () => {
     const lightbox = qs("#image-lightbox");
     if (!lightbox) return;
 
     const lightboxImg = qs(".lightbox-img", lightbox);
     if (!lightboxImg) return;
 
-    // toolbar container
     const controls = doc.createElement("div");
     controls.classList.add("lightbox-controls");
     lightbox.appendChild(controls);
 
-    const zoomBtn = doc.createElement("button");
-    zoomBtn.classList.add("zoom-in-btn");
-    zoomBtn.innerHTML = `
+    const mkBtn = (cls, html) => {
+      const btn = doc.createElement("button");
+      btn.className = cls;
+      btn.innerHTML = html;
+      return btn;
+    };
+
+    const zoomBtn = mkBtn(
+      "zoom-in-btn",
+      `
       <svg xmlns="http://www.w3.org/2000/svg" width="17" height="20" viewBox="0 -3 26 30" fill="white">
         <path d="M10 2a8 8 0 105.292 14.292l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z"/>
       </svg>
-    `;
-
-    const fullscreenBtn = doc.createElement("button");
-    fullscreenBtn.classList.add("fullscreen-btn");
-    fullscreenBtn.textContent = "⛶";
-
-    const shareBtn = doc.createElement("button");
-    shareBtn.classList.add("share-btn");
-    shareBtn.textContent = "↗";
-
-    const closeBtn = doc.createElement("button");
-    closeBtn.classList.add("lightbox-close");
-    closeBtn.textContent = "✕";
+    `
+    );
+    const fullscreenBtn = mkBtn("fullscreen-btn", "⛶");
+    const shareBtn = mkBtn("share-btn", "↗");
+    const closeBtn = mkBtn("lightbox-close", "✕");
 
     controls.append(zoomBtn, fullscreenBtn, shareBtn, closeBtn);
 
@@ -1090,69 +840,49 @@
     shareMenu.innerHTML = `
       <ul>
         <li data-share="facebook">
-          <img 
-            src="https://img.icons8.com/color/24/000000/facebook-new.png" 
-            alt="Facebook" 
-            style="vertical-align: middle; margin-right: 8px; width: 20px; height: 20px;" 
-          />
+          <img src="https://img.icons8.com/color/24/000000/facebook-new.png" alt="Facebook" style="vertical-align:middle;margin-right:8px;width:20px;height:20px;" />
           Share on Facebook
         </li>
         <li data-share="twitter">
-          <img 
-            src="https://img.icons8.com/color/24/000000/twitter--v1.png" 
-            alt="Twitter" 
-            style="vertical-align: middle; margin-right: 8px; width: 20px; height: 20px;" 
-          />
+          <img src="https://img.icons8.com/color/24/000000/twitter--v1.png" alt="Twitter" style="vertical-align:middle;margin-right:8px;width:20px;height:20px;" />
           Share on Twitter
         </li>
         <li data-share="pinterest">
-          <img 
-            src="https://img.icons8.com/color/24/000000/pinterest--v1.png" 
-            alt="Pinterest" 
-            style="vertical-align: middle; margin-right: 8px; width: 20px; height: 20px;" 
-          />
+          <img src="https://img.icons8.com/color/24/000000/pinterest--v1.png" alt="Pinterest" style="vertical-align:middle;margin-right:8px;width:20px;height:20px;" />
           Pin it
         </li>
         <li data-download>
-          <img 
-            src="https://img.icons8.com/color/24/000000/download--v1.png" 
-            alt="Download" 
-            style="vertical-align: middle; margin-right: 8px; width: 20px; height: 20px;" 
-          />
+          <img src="https://img.icons8.com/color/24/000000/download--v1.png" alt="Download" style="vertical-align:middle;margin-right:8px;width:20px;height:20px;" />
           Download image
         </li>
       </ul>
     `;
     lightbox.appendChild(shareMenu);
 
-    function openLightbox(src) {
+    const openLightbox = src => {
       if (!src) return;
       lightboxImg.src = src;
       lightbox.classList.add("active");
       lockPageScroll();
       body.style.overflow = "hidden";
-    }
+    };
 
-    function closeLightbox() {
+    const closeLightbox = () => {
       lightbox.classList.remove("active");
       unlockPageScroll();
       lightboxImg.style.transform = "scale(1)";
       shareMenu.classList.remove("open");
       body.style.overflow = "";
-    }
+    };
 
-    // open from media
     qsa(".media img, .media-slide, .sa-overlay-media img").forEach(el => {
       el.style.cursor = "zoom-in";
 
       el.addEventListener("click", e => {
         e.stopPropagation();
-
         let sourceEl = el;
         if (el.classList.contains("media-slide")) {
-          const active = el.parentElement.querySelector(
-            ".media-slide.is-active"
-          );
+          const active = el.parentElement.querySelector(".media-slide.is-active");
           if (active) sourceEl = active;
         }
 
@@ -1163,25 +893,18 @@
       });
     });
 
-    // close actions
     closeBtn.addEventListener("click", closeLightbox);
 
     lightbox.addEventListener("click", e => {
-      if (e.target.classList.contains("lightbox-backdrop")) {
-        closeLightbox();
-      }
+      if (e.target.classList.contains("lightbox-backdrop")) closeLightbox();
     });
 
-    // zoom
     zoomBtn.addEventListener("click", e => {
       e.stopPropagation();
       lightboxImg.style.transform =
-        lightboxImg.style.transform === "scale(2)"
-          ? "scale(1)"
-          : "scale(2)";
+        lightboxImg.style.transform === "scale(2)" ? "scale(1)" : "scale(2)";
     });
 
-    // fullscreen
     fullscreenBtn.addEventListener("click", e => {
       e.stopPropagation();
       if (!doc.fullscreenElement) {
@@ -1191,17 +914,14 @@
       }
     });
 
-    // share menu toggle
     shareBtn.addEventListener("click", e => {
       e.stopPropagation();
       shareMenu.classList.toggle("open");
     });
 
-    // share / download
     shareMenu.addEventListener("click", e => {
       const target = e.target.closest("li");
       if (!target) return;
-
       const imgUrl = lightboxImg.src;
 
       if (target.dataset.share === "facebook") {
@@ -1212,9 +932,7 @@
         );
       } else if (target.dataset.share === "twitter") {
         window.open(
-          `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-            imgUrl
-          )}`
+          `https://twitter.com/intent/tweet?url=${encodeURIComponent(imgUrl)}`
         );
       } else if (target.dataset.share === "pinterest") {
         window.open(
@@ -1230,42 +948,35 @@
       }
     });
 
-    doc.addEventListener("click", () => {
-      shareMenu.classList.remove("open");
-    });
-  }
+    doc.addEventListener("click", () => shareMenu.classList.remove("open"));
+  };
 
-  // ---------------------------------------------------
-  // DOM READY / LOAD
-  // ---------------------------------------------------
+  // ---------- DOM READY / LOAD ----------
 
-    doc.addEventListener("DOMContentLoaded", () => {
-      body = doc.body; 
+  doc.addEventListener("DOMContentLoaded", () => {
+    body = doc.body;
 
-      // footer year
-      const yearSpan = qs("#year");
-      if (yearSpan) {
-        yearSpan.textContent = new Date().getFullYear();
-      }
+    const yearSpan = qs("#year");
+    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
-      docEl.classList.add("page-loading");
-      body.classList.add("page-loading");
+    docEl.classList.add("page-loading");
+    body.classList.add("page-loading");
 
-      initHistoryOverlayHandling();
-      initNavLinksBehavior();
-      initAboutOverlay();
-      initCharityOverlay();
-      initCharityPagination();
-      initCharityCards();
-      initAssociationsOverlays();
-      initAssocCards();
-      initAutoSlideCarousels();
-      initOverlayBackdropClose();
-      initCompaniesCarousel();
-      initLightbox();
+    initHistoryOverlayHandling();
+    initNavLinksBehavior();
+    initSimpleOverlay(".js-about-open", "#aboutme-overlay");
+    initSimpleOverlay(".js-charity-open", "#charity-overlay");
+    initCharityPagination();
+    initCharityCards();
+    initAssociationsOverlays();
+    initAssocCards();
+    initAutoSlideCarousels();
+    initOverlayBackdropClose();
+    initCompaniesCarousel();
+    initLightbox();
 
-      setTimeout(hideLoaderAndRevealContent, 200);
-    });
+    setTimeout(hideLoaderAndRevealContent, 200);
+  });
 
   window.addEventListener("load", unlockScrollAfterAssets);
 })();
