@@ -4059,49 +4059,49 @@
     <b>Patrick Achache</b> © <span id="year"></span>. All Rights Reserved.
   </footer>
 
-
   <script>
-    (function () {
-      emailjs.init({
-        publicKey: "uelTOKuwbo0YX28lb",
-      });
-    })();
+    // Initialize EmailJS
+    emailjs.init({ publicKey: "uelTOKuwbo0YX28lb" });
 
     function sendMail(event) {
       event.preventDefault();
 
       const btn = document.getElementById("contact-btn");
+      const form = document.querySelector(".contact-form");
 
-      // Get field values
-      const first = document.getElementById("first").value.trim();
-      const last = document.getElementById("last").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const subject = document.getElementById("subject").value.trim();
-      const message = document.getElementById("message").value.trim();
+      const fields = {
+        first: document.getElementById("first").value.trim(),
+        last: document.getElementById("last").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        subject: document.getElementById("subject").value.trim(),
+        message: document.getElementById("message").value.trim(),
+      };
 
-      // Check required fields
-      if (!email || !subject || !message) {
+      // Validate required fields
+      if (!fields.email || !fields.subject || !fields.message) {
         return;
       }
 
-      btn.textContent = "Submitting...";
-      btn.disabled = true;
+      // Helper to update button UI
+      const setButtonState = (loading) => {
+        btn.textContent = loading ? "Submitting..." : "SUBMIT";
+        btn.disabled = loading;
+      };
 
-      const parms = { first, last, email, subject, message };
+      setButtonState(true);
 
-      emailjs.send("service_8blvy2j", "template_1m0n517", parms)
+      emailjs
+        .send("service_8blvy2j", "template_1m0n517", fields)
         .then(() => {
-          btn.textContent = "SUBMIT";
-          btn.disabled = false;
-          document.querySelector(".contact-form").reset();
+          form.reset();
+          setButtonState(false);
         })
         .catch((err) => {
-          btn.textContent = "SUBMIT";
-          btn.disabled = false;
           console.error(err);
+          setButtonState(false);
         });
     }
-  </script>
-</body>
+</script>
 
+</body>
 </html>
