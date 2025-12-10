@@ -3,6 +3,9 @@
   const docEl = doc.documentElement;
   let body;
 
+  // ---------------------------------------
+  // SHORTCUTS
+  // ---------------------------------------
   const qs = (sel, root = doc) => root.querySelector(sel);
   const qsa = (sel, root = doc) => root.querySelectorAll(sel);
 
@@ -18,6 +21,50 @@
   let contentRevealed = false;
   let scrollUnlocked = false;
 
+  // ---------------------------------------
+  // NAVIGATION LINKS
+  // ---------------------------------------
+  const initNavLinksBehavior = () => {
+    qsa(".nav-link, .nav-center").forEach(link => {
+      link.addEventListener("click", () => {
+        hideAllOverlays();
+        resetAllExpandableCards();
+        if (window.resetCharityOverlayState) window.resetCharityOverlayState();
+        if (window.resetAssocOverlayState) window.resetAssocOverlayState();
+      });
+    });
+
+    const homeLink = qs('[href="#home"]');
+    const aboutLink = qs('[href="#about"]');
+    const charityLink = qs('[href="#charity"]');
+    const assocNavLink = qs('[href="#associations"]');
+
+    if (homeLink) homeLink.addEventListener("click", animateHero);
+
+    if (aboutLink)
+      aboutLink.addEventListener("click", () => {
+        triggerAnimation(qs("#about .copy"), "left");
+        triggerAnimation(qs("#about .image-stack"), "right");
+      });
+
+    if (charityLink)
+      charityLink.addEventListener("click", () => {
+        triggerAnimation(qs("#charity .charity-content"), "bottom");
+      });
+
+    if (assocNavLink)
+      assocNavLink.addEventListener("click", () => {
+        qsa("#associations .sa-item").forEach((item, i) => {
+          const idx = i + 1;
+          const dir = [1, 2, 3, 5].includes(idx) ? "left" : "right";
+          triggerAnimation(item, dir);
+        });
+      });
+  };
+
+  // ---------------------------------------
+  // SCROLL LOCK / OVERLAY HELPERS
+  // ---------------------------------------
   const anyOverlayOpen = () =>
     [...qsa(ALL_OVERLAYS_SELECTOR)].some(ov =>
       ov.classList.contains("is-visible")
@@ -34,7 +81,8 @@
     body.style.overflow = "";
   };
 
-  const updateScrollLock = () => (anyOverlayOpen() ? lockPageScroll() : unlockPageScroll());
+  const updateScrollLock = () =>
+    anyOverlayOpen() ? lockPageScroll() : unlockPageScroll();
 
   const ANIM_CLASSES = [
     "animate-from-left",
@@ -53,7 +101,7 @@
     };
     const cls = classMap[dir] || classMap.left;
     el.classList.remove(...ANIM_CLASSES);
-    void el.offsetWidth;
+    void el.offsetWidth; // restart animation
     el.classList.add(cls);
     el.addEventListener("animationend", () => el.classList.remove(cls), {
       once: true
@@ -66,27 +114,42 @@
     updateScrollLock();
     try {
       history.pushState({ overlay: overlayEl.id || true }, "", window.location.href);
-    } catch {}
+    } catch {
+      // ignore history errors
+    }
   };
 
   const hideAllOverlays = () => {
-    qsa(ALL_OVERLAYS_SELECTOR).forEach(ov => ov.classList.remove("is-visible"));
+    qsa(ALL_OVERLAYS_SELECTOR).forEach(ov =>
+      ov.classList.remove("is-visible")
+    );
     updateScrollLock();
   };
 
+  // ---------------------------------------
+  // HERO + SECTION REVEAL
+  // ---------------------------------------
   const animateHero = () => {
     triggerAnimation(qs("#home .hero-content"), "left");
     triggerAnimation(qs("#home .hero-text"), "right");
   };
 
   const revealSectionsInOrder = () => {
-    ["home", "about", "charity", "associations", "contact"].forEach((key, i) => {
-      const section = qs(`[data-section="${key}"]`);
-      if (!section) return;
-      setTimeout(() => section.classList.add("section-visible"), i * 400);
-    });
+    ["home", "about", "charity", "associations", "contact"].forEach(
+      (key, i) => {
+        const section = qs(`[data-section="${key}"]`);
+        if (!section) return;
+        setTimeout(
+          () => section.classList.add("section-visible"),
+          i * 400
+        );
+      }
+    );
   };
 
+  // ---------------------------------------
+  // LOADER + INITIAL SCROLL CONTROL
+  // ---------------------------------------
   const hideLoaderAndRevealContent = () => {
     if (contentRevealed) return;
     contentRevealed = true;
@@ -117,15 +180,173 @@
   };
 
   // ---------- CHARITY PAGINATION + CARDS ----------
+  const initCharityPagination = () =>
+    initPaginatedOverlay({
+      cardSelector: "#charity-overlay .charity-card",
+      pagerSelector: "#charity-pagination",
+      perPage: 10,
+      stackSelectors: ["#charity-stack"],
+      resetName: "resetCharityOverlayState"
+    });
 
-  const initCharityPagination = () => {
+  // ---------- ASSOCIATIONS PAGINATION ----------
+  const initAssocPagination = () =>
+    initPaginatedOverlay({
+      cardSelector: "#associations-overlay .assoc-card",
+      pagerSelector: "#assoc-pagination",
+      perPage: 10,
+      stackSelectors: ["#assoc-stack", "#associations-overlay .assoc-stack"],
+      resetName: "resetAssocOverlayState"
+    });
+
+  const initCards = () => {
     const cards = [...qsa("#charity-overlay .charity-card")];
-    const pagerRoot = qs("#charity-pagination");
-    const perPage = 10;
+
+    cards.forEach(card => {
+      const toggle = qs(".charity-read-toggle", card);
+      const extra = qs(".charity-extra-wrapper", card);
+      const videoSlide = qs(".video-wrapper", card);
+      const slides = qsa(".media-slide", card);
+      const prev = qs(".media-prev", card);
+      const next = qs(".media-next", card);
+
+      let currentIndex = 0;
+      let dotsWrap = null;
+      let dots = [];
+
+      // dots
+      if (slides.length >= 2) {
+        dotsWrap = doc.createElement("div");
+        dotsWrap.className = "media-dots";
+        dotsWrap.style.display = "none";
+
+        slides.forEach((_s, i) => {
+          const dot = doc.createElement("div");
+          dot.className = "media-dot";
+          if (i === 0) dot.classList.add("is-active");
+          dotsWrap.appendChild(dot);
+          dots.push(dot);
+        });
+
+        const mediaInner = qs(".media-inner", card);
+        if (mediaInner) mediaInner.appendChild(dotsWrap);
+      }
+
+      // video click
+      if (videoSlide) {
+        const video = qs("video", videoSlide);
+        const playIcon = qs(".play-icon", videoSlide);
+
+        videoSlide.addEventListener("click", e => {
+          e.stopPropagation();
+          if (currentIndex !== [...slides].indexOf(videoSlide)) return;
+          if (!video) return;
+          video.play();
+          if (playIcon) playIcon.style.display = "none";
+        });
+      }
+
+      const showSlide = index => {
+        if (!slides.length) return;
+        if (index < 0) index = slides.length - 1;
+        if (index >= slides.length) index = 0;
+        currentIndex = index;
+
+        slides.forEach((slide, i) => {
+          const active = i === currentIndex;
+          slide.classList.toggle("is-active", active);
+
+          const video = qs("video", slide);
+          const playIcon = qs(".play-icon", slide);
+          if (!video) return;
+
+          if (active) {
+            video.currentTime = 0;
+            video.play();
+            if (playIcon) playIcon.style.display = "none";
+          } else {
+            video.pause();
+            video.currentTime = 0;
+            if (playIcon) playIcon.style.display = "flex";
+          }
+        });
+
+        dots.forEach((dot, i) =>
+          dot.classList.toggle("is-active", i === currentIndex)
+        );
+      };
+
+      if (slides.length <= 1) {
+        if (prev) prev.style.display = "none";
+        if (next) next.style.display = "none";
+      } else {
+        showSlide(0);
+        if (prev)
+          prev.addEventListener("click", e => {
+            e.stopPropagation();
+            e.preventDefault();
+            showSlide(currentIndex - 1);
+          });
+        if (next)
+          next.addEventListener("click", e => {
+            e.stopPropagation();
+            e.preventDefault();
+            showSlide(currentIndex + 1);
+          });
+      }
+
+      if (!toggle || !extra) return;
+
+      toggle.style.cursor = "pointer";
+
+      toggle.addEventListener("click", () => {
+        const willExpand = !card.classList.contains("expanded");
+
+        // close others
+        cards.forEach(other => {
+          if (other === card) return;
+          other.classList.remove("expanded");
+          const otherToggle = qs(".charity-read-toggle", other);
+          if (otherToggle) otherToggle.textContent = "Read more";
+          const otherDotsWrap = qs(".media-dots", other);
+          if (otherDotsWrap) otherDotsWrap.style.display = "none";
+          qsa(".media-slide", other).forEach((slide, i) =>
+            slide.classList.toggle("is-active", i === 0)
+          );
+        });
+
+        card.classList.toggle("expanded", willExpand);
+        toggle.textContent = willExpand ? "Read less" : "Read more";
+        if (dotsWrap) dotsWrap.style.display = willExpand ? "flex" : "none";
+        if (!willExpand) showSlide(0);
+      });
+    });
+  };
+
+  // ---------------------------------------
+  // GENERIC PAGINATION HELPER (USED BY BOTH OVERLAYS)
+  // ---------------------------------------
+  function initPaginatedOverlay({
+    cardSelector,
+    pagerSelector,
+    perPage = 10,
+    stackSelectors = [],
+    resetName // window function name
+  }) {
+    const cards = [...qsa(cardSelector)];
+    const pagerRoot = qs(pagerSelector);
     if (!cards.length || !pagerRoot) return;
 
     const totalPages = Math.ceil(cards.length / perPage);
     let currentPage = 1;
+
+    const getStack = () => {
+      for (const sel of stackSelectors) {
+        const el = qs(sel);
+        if (el) return el;
+      }
+      return null;
+    };
 
     const renderPage = page => {
       page = Math.max(1, Math.min(page, totalPages));
@@ -140,7 +361,7 @@
 
       buildPager();
 
-      const stack = qs("#charity-stack");
+      const stack = getStack();
       if (stack) stack.scrollTo({ top: 0, behavior: "smooth" });
     };
 
@@ -187,10 +408,13 @@
         pagerRoot.appendChild(span);
       };
 
+      // prev arrow
       pagerRoot.appendChild(createArrowBtn("prev"));
 
       if (totalPages <= MAX_VISIBLE + 2) {
-        for (let i = 1; i <= totalPages; i++) pagerRoot.appendChild(createPageBtn(i));
+        for (let i = 1; i <= totalPages; i++) {
+          pagerRoot.appendChild(createPageBtn(i));
+        }
       } else {
         const first = 1;
         const last = totalPages;
@@ -216,152 +440,30 @@
         pagerRoot.appendChild(createPageBtn(last));
       }
 
+      // next arrow
       pagerRoot.appendChild(createArrowBtn("next"));
     };
 
-    window.resetCharityOverlayState = () => {
-      renderPage(1);
-      const stack = qs("#charity-stack");
-      if (stack) stack.scrollTo({ top: 0, behavior: "auto" });
-    };
+    // global reset used by nav + overlay close
+    if (resetName) {
+      window[resetName] = () => {
+        renderPage(1);
+        const stack = getStack();
+        if (stack) stack.scrollTo({ top: 0, behavior: "auto" });
+      };
+    }
 
     renderPage(1);
-  };
+  }
 
-  const initCharityCards = () => {
-    const cards = [...qsa("#charity-overlay .charity-card")];
-
-    cards.forEach(card => {
-      const toggle = qs(".charity-read-toggle", card);
-      const extra = qs(".charity-extra-wrapper", card);
-      const videoSlide = qs(".video-wrapper", card);
-      const slides = qsa(".media-slide", card);
-      const prev = qs(".media-prev", card);
-      const next = qs(".media-next", card);
-
-      let currentIndex = 0;
-      let dotsWrap = null;
-      let dots = [];
-
-      if (slides.length >= 2) {
-        dotsWrap = doc.createElement("div");
-        dotsWrap.className = "media-dots";
-        dotsWrap.style.display = "none";
-
-        slides.forEach((_s, i) => {
-          const dot = doc.createElement("div");
-          dot.className = "media-dot";
-          if (i === 0) dot.classList.add("is-active");
-          dotsWrap.appendChild(dot);
-          dots.push(dot);
-        });
-
-        const mediaInner = qs(".media-inner", card);
-        if (mediaInner) mediaInner.appendChild(dotsWrap);
-      }
-
-      if (videoSlide) {
-        const video = qs("video", videoSlide);
-        const playIcon = qs(".play-icon", videoSlide);
-
-        videoSlide.addEventListener("click", e => {
-          e.stopPropagation();
-          if (currentIndex !== [...slides].indexOf(videoSlide)) return;
-          if (video) {
-            video.play();
-            if (playIcon) playIcon.style.display = "none";
-          }
-        });
-      }
-
-      const showSlide = index => {
-        if (!slides.length) return;
-
-        if (index < 0) index = slides.length - 1;
-        if (index >= slides.length) index = 0;
-        currentIndex = index;
-
-        slides.forEach((slide, i) => {
-          const active = i === currentIndex;
-          slide.classList.toggle("is-active", active);
-
-          const video = qs("video", slide);
-          const playIcon = qs(".play-icon", slide);
-
-          if (!video) return;
-
-          if (active) {
-            video.currentTime = 0;
-            video.play();
-            if (playIcon) playIcon.style.display = "none";
-          } else {
-            video.pause();
-            video.currentTime = 0;
-            if (playIcon) playIcon.style.display = "flex";
-          }
-        });
-
-        if (dots.length) {
-          dots.forEach((dot, i) =>
-            dot.classList.toggle("is-active", i === currentIndex)
-          );
-        }
-      };
-
-      if (slides.length <= 1) {
-        if (prev) prev.style.display = "none";
-        if (next) next.style.display = "none";
-      } else {
-        showSlide(0);
-        if (prev)
-          prev.addEventListener("click", e => {
-            e.stopPropagation();
-            e.preventDefault();
-            showSlide(currentIndex - 1);
-          });
-
-        if (next)
-          next.addEventListener("click", e => {
-            e.stopPropagation();
-            e.preventDefault();
-            showSlide(currentIndex + 1);
-          });
-      }
-
-      if (!toggle || !extra) return;
-
-      toggle.style.cursor = "pointer";
-
-      toggle.addEventListener("click", e => {
-        e.stopPropagation();
-        const willExpand = !card.classList.contains("expanded");
-
-        cards.forEach(other => {
-          if (other === card) return;
-          other.classList.remove("expanded");
-          const otherToggle = qs(".charity-read-toggle", other);
-          if (otherToggle) otherToggle.textContent = "Read more";
-          const otherDotsWrap = qs(".media-dots", other);
-          if (otherDotsWrap) otherDotsWrap.style.display = "none";
-          qsa(".media-slide", other).forEach((slide, i) =>
-            slide.classList.toggle("is-active", i === 0)
-          );
-        });
-
-        card.classList.toggle("expanded", willExpand);
-        toggle.textContent = willExpand ? "Read less" : "Read more";
-        if (dotsWrap) dotsWrap.style.display = willExpand ? "flex" : "none";
-        if (!willExpand) showSlide(0);
-      });
-    });
-  };
-
-  // ---------- ASSOCIATIONS (CARDS + SMALL OVERLAYS) ----------
-
+  // ---------------------------------------
+  // ASSOCIATIONS (CARDS + SMALL OVERLAYS)
+  // ---------------------------------------
   const initAssociationsOverlays = () => {
     const assocOverlay = qs("#associations-overlay");
     const assocOpen = qs(".js-assoc-open");
 
+    // small SA overlays
     qsa(".js-sa-open").forEach(btn => {
       btn.addEventListener("click", e => {
         e.preventDefault();
@@ -449,8 +551,7 @@
 
       toggle.style.cursor = "pointer";
 
-      toggle.addEventListener("click", e => {
-        e.stopPropagation();
+      toggle.addEventListener("click", () => {
         const willExpand = !card.classList.contains("expanded");
 
         assocCards.forEach(other => {
@@ -477,15 +578,69 @@
         if (!willExpand) showSlide(0);
       });
     });
-
-    const assocStack = qs("#associations-overlay .assoc-stack");
-    window.resetAssocOverlayState = () => {
-      if (assocStack) assocStack.scrollTo({ top: 0, behavior: "auto" });
-    };
   };
 
-  // ---------- AUTO-SLIDE CAROUSEL (charity & assoc cards) ----------
+  // ---------------------------------------
+  // RESET EXPANDABLE CARDS
+  // ---------------------------------------
+  const resetAllExpandableCards = () => {
+    qsa(".charity-card, .assoc-card").forEach(card => {
+      card.classList.remove("expanded");
 
+      const toggle = qs(".charity-read-toggle, .assoc-read-toggle", card);
+      if (toggle) toggle.textContent = "Read more";
+
+      const dotsWrap = qs(".media-dots", card);
+      if (dotsWrap) dotsWrap.style.display = "none";
+
+      const slides = qsa(".media-slide", card);
+      const dots = qsa(".media-dot", card);
+
+      slides.forEach((slide, i) =>
+        slide.classList.toggle("is-active", i === 0)
+      );
+      dots.forEach((dot, i) =>
+        dot.classList.toggle("is-active", i === 0)
+      );
+    });
+  };
+
+  // ---------------------------------------
+  // GENERIC OVERLAY HELPERS
+  // ---------------------------------------
+  const initSimpleOverlay = (triggerSel, overlaySel) => {
+    const overlay = qs(overlaySel);
+    const trigger = qs(triggerSel);
+    if (!overlay || !trigger) return;
+
+    trigger.addEventListener("click", () => showOverlay(overlay));
+  };
+
+  const initOverlayBackdropClose = () => {
+    doc.addEventListener("click", e => {
+      const overlay = e.target.closest(ALL_OVERLAYS_SELECTOR);
+      if (!overlay) return;
+
+      const innerCard = e.target.closest(
+        ".aboutme-inner, .stack, .assoc-stack, .sa-overlay-card"
+      );
+      if (innerCard) return;
+
+      overlay.classList.remove("is-visible");
+      updateScrollLock();
+      resetAllExpandableCards();
+      if (window.resetCharityOverlayState) window.resetCharityOverlayState();
+      if (window.resetAssocOverlayState) window.resetAssocOverlayState();
+    });
+  };
+
+  const initHistoryOverlayHandling = () => {
+    window.addEventListener("popstate", hideAllOverlays);
+  };
+
+  // ---------------------------------------
+  // AUTO-SLIDE CAROUSELS FOR CHARITY AND ASSOC CARD
+  // ---------------------------------------
   const initAutoSlideCarousels = () => {
     qsa(".charity-card, .assoc-card").forEach(card => {
       const mediaInner = qs(".media-inner", card);
@@ -554,104 +709,9 @@
     });
   };
 
-  // ---------- RESET EXPANDABLE CARDS ----------
-
-  const resetAllExpandableCards = () => {
-    qsa(".charity-card, .assoc-card").forEach(card => {
-      card.classList.remove("expanded");
-
-      const toggle = qs(".charity-read-toggle, .assoc-read-toggle", card);
-      if (toggle) toggle.textContent = "Read more";
-
-      const dotsWrap = qs(".media-dots", card);
-      if (dotsWrap) dotsWrap.style.display = "none";
-
-      const slides = qsa(".media-slide", card);
-      const dots = qsa(".media-dot", card);
-
-      slides.forEach((slide, i) =>
-        slide.classList.toggle("is-active", i === 0)
-      );
-      dots.forEach((dot, i) =>
-        dot.classList.toggle("is-active", i === 0)
-      );
-    });
-  };
-
-  // ---------- NAVIGATION LINKS ----------
-
-  const initNavLinksBehavior = () => {
-    qsa(".nav-link, .nav-center").forEach(link => {
-      link.addEventListener("click", () => {
-        hideAllOverlays();
-        resetAllExpandableCards();
-        if (window.resetCharityOverlayState) window.resetCharityOverlayState();
-        if (window.resetAssocOverlayState) window.resetAssocOverlayState();
-      });
-    });
-
-    const homeLink = qs('[href="#home"]');
-    const aboutLink = qs('[href="#about"]');
-    const charityLink = qs('[href="#charity"]');
-    const assocNavLink = qs('[href="#associations"]');
-
-    if (homeLink) homeLink.addEventListener("click", animateHero);
-
-    if (aboutLink)
-      aboutLink.addEventListener("click", () => {
-        triggerAnimation(qs("#about .copy"), "left");
-        triggerAnimation(qs("#about .image-stack"), "right");
-      });
-
-    if (charityLink)
-      charityLink.addEventListener("click", () => {
-        triggerAnimation(qs("#charity .charity-content"), "bottom");
-      });
-
-    if (assocNavLink)
-      assocNavLink.addEventListener("click", () => {
-        qsa("#associations .sa-item").forEach((item, i) => {
-          const idx = i + 1;
-          const dir = [1, 2, 3, 5].includes(idx) ? "left" : "right";
-          triggerAnimation(item, dir);
-        });
-      });
-  };
-
-  // ---------- GENERIC OVERLAY INIT HELPERS ----------
-
-  const initSimpleOverlay = (triggerSel, overlaySel) => {
-    const overlay = qs(overlaySel);
-    const trigger = qs(triggerSel);
-    if (!overlay || !trigger) return;
-
-    trigger.addEventListener("click", () => showOverlay(overlay));
-  };
-
-  const initOverlayBackdropClose = () => {
-    doc.addEventListener("click", e => {
-      const overlay = e.target.closest(ALL_OVERLAYS_SELECTOR);
-      if (!overlay) return;
-
-      const innerCard = e.target.closest(
-        ".aboutme-inner, .stack, .assoc-stack, .sa-overlay-card"
-      );
-      if (innerCard) return;
-
-      overlay.classList.remove("is-visible");
-      updateScrollLock();
-      resetAllExpandableCards();
-      if (window.resetCharityOverlayState) window.resetCharityOverlayState();
-      if (window.resetAssocOverlayState) window.resetAssocOverlayState();
-    });
-  };
-
-  const initHistoryOverlayHandling = () => {
-    window.addEventListener("popstate", hideAllOverlays);
-  };
-
-  // ---------- COMPANIES CAROUSEL ----------
-
+  // ---------------------------------------
+  // COMPANIES CAROUSEL
+  // ---------------------------------------
   const initCompaniesCarousel = () => {
     const track = qs(".companies-track");
     const bubbles = [...qsa(".company-bubble")];
@@ -677,7 +737,8 @@
       bubbles.forEach((bubble, i) => {
         const logicalX = i * SPACING + baseOffset;
         const wrapped =
-          ((logicalX % totalWidth) + totalWidth) % totalWidth - totalWidth / 2;
+          ((logicalX % totalWidth) + totalWidth) % totalWidth -
+          totalWidth / 2;
 
         bubble.style.left = `${centerX + wrapped}px`;
       });
@@ -801,8 +862,9 @@
     animID = requestAnimationFrame(loop);
   };
 
-  // ---------- LIGHTBOX ----------
-
+  // ---------------------------------------
+  // LIGHTBOX
+  // ---------------------------------------
   const initLightbox = () => {
     const lightbox = qs("#image-lightbox");
     if (!lightbox) return;
@@ -882,7 +944,9 @@
         e.stopPropagation();
         let sourceEl = el;
         if (el.classList.contains("media-slide")) {
-          const active = el.parentElement.querySelector(".media-slide.is-active");
+          const active = el.parentElement.querySelector(
+            ".media-slide.is-active"
+          );
           if (active) sourceEl = active;
         }
 
@@ -951,8 +1015,9 @@
     doc.addEventListener("click", () => shareMenu.classList.remove("open"));
   };
 
-  // ---------- DOM READY / LOAD ----------
-
+  // ---------------------------------------
+  // DOM READY / LOAD
+  // ---------------------------------------
   doc.addEventListener("DOMContentLoaded", () => {
     body = doc.body;
 
@@ -967,7 +1032,8 @@
     initSimpleOverlay(".js-about-open", "#aboutme-overlay");
     initSimpleOverlay(".js-charity-open", "#charity-overlay");
     initCharityPagination();
-    initCharityCards();
+    initAssocPagination();
+    initCards();
     initAssociationsOverlays();
     initAssocCards();
     initAutoSlideCarousels();
