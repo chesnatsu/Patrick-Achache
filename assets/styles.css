@@ -695,7 +695,7 @@
     .pattern {
       position: absolute;
       inset: 0;
-      background-image: url("../images/PA-Images/Charity_bg.png"); 
+      background-image: url("images/PA-Images/Charity_bg.png"); 
       background-repeat: repeat;
       background-size: 1990px auto;
       filter: contrast(0.95) brightness(0.5);
@@ -1361,7 +1361,7 @@
     .companies-bg {
       position: absolute;
       inset: 0;
-      background-image: url("../images/PA-Images/Buildings2.png"); 
+      background-image: url("images/PA-Images/Buildings2.png"); 
       background-size: cover;
       background-position: center;
       filter: brightness(0.3);
