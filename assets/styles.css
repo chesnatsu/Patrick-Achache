@@ -1824,8 +1824,8 @@
     .recaptcha-inner {
       display: flex;
       align-items: center;
-      width: 50px;
-      height: 50px; 
+      width: 55px;
+      height: 55px; 
       background: #fff;
       box-shadow: 0 2px 6px rgba(0,0,0,.25);
       overflow: hidden;
@@ -1835,12 +1835,12 @@
     .recaptcha-float:hover .recaptcha-inner {
       width: 200px;
       background: #1a73e8;
-      height: 50px;
+      height: 55px;
     }
 
     .recaptcha-logo {
-      min-width: 50px;
-      height: 50px;
+      min-width: 55px;
+      height: 55px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1848,14 +1848,9 @@
       background: #fff;
     }
 
-    .recaptcha-logo img {
-      width: 30px;
-      height: 30px;
-    }
-
     .recaptcha-logo::after {
       content: "Privacy - Terms";
-      font-size: 5px;
+      font-size: 7px;
       color: gray;
       margin-top: 2px;
     }
