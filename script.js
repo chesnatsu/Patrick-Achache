@@ -165,6 +165,7 @@
     revealSectionsInOrder();
     animateHero();
   };
+  
 
   const unlockScrollAfterAssets = () => {
     if (scrollUnlocked) return;
