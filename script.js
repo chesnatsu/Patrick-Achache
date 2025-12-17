@@ -101,7 +101,7 @@
     };
     const cls = classMap[dir] || classMap.left;
     el.classList.remove(...ANIM_CLASSES);
-    void el.offsetWidth; // restart animation
+    void el.offsetWidth;
     el.classList.add(cls);
     el.addEventListener("animationend", () => el.classList.remove(cls), {
       once: true
@@ -115,8 +115,8 @@
     try {
       history.pushState({ overlay: overlayEl.id || true }, "", window.location.href);
     } catch {
-      // ignore history errors
     }
+    if (window.updateBackToTopVisibility) window.updateBackToTopVisibility();
   };
 
   const hideAllOverlays = () => {
@@ -332,7 +332,7 @@
     pagerSelector,
     perPage = 10,
     stackSelectors = [],
-    resetName // window function name
+    resetName
   }) {
     const cards = [...qsa(cardSelector)];
     const pagerRoot = qs(pagerSelector);
@@ -1015,62 +1015,37 @@
 
     doc.addEventListener("click", () => shareMenu.classList.remove("open"));
   };
-const initBackToTop = () => {
-  const btn = qs("#backToTop");
-  if (!btn) return;
 
-  const stacks = [
-    () => qs("#charity-stack"),
-    () => qs("#assoc-stack"),
-    () => qs("#associations-overlay .assoc-stack")
-  ];
+    const initBackToTop = () => {
+    const btn = qs("#backToTop");
+    if (!btn) return;
 
-  const activeScrollContainer = () => {
-    // if an overlay is visible, prefer its inner stack for scrolling
-    const charityOverlay = qs("#charity-overlay");
-    const assocOverlay = qs("#associations-overlay");
+    const isOverlayOpen = () =>
+      [...qsa(ALL_OVERLAYS_SELECTOR)].some(ov => ov.classList.contains("is-visible"));
 
-    if (charityOverlay?.classList.contains("is-visible")) return stacks[0]();
-    if (assocOverlay?.classList.contains("is-visible"))
-      return stacks[1]() || stacks[2]();
+    const updateVisibility = () => {
+      if (isOverlayOpen()) {
+        btn.classList.remove("is-visible");
+        btn.style.pointerEvents = "none";
+        return;
+      }
 
-    return null;
-  };
+      btn.style.pointerEvents = "";
+      const scrollTop = window.scrollY || docEl.scrollTop || 0;
+      btn.classList.toggle("is-visible", scrollTop > 200);
+    };
 
-  const updateVisibility = () => {
-    const scroller = activeScrollContainer();
+    window.updateBackToTopVisibility = updateVisibility;
+    window.addEventListener("scroll", updateVisibility, { passive: true });
 
-    const top = scroller
-      ? scroller.scrollTop
-      : (window.scrollY || docEl.scrollTop || 0);
-
-    btn.classList.toggle("is-visible", top > 200);
-  };
-
-  // Track main page scroll
-  window.addEventListener("scroll", updateVisibility, { passive: true });
-
-  // Track overlay stacks scroll
-  const watchStacks = () => {
-    const s1 = qs("#charity-stack");
-    const s2 = qs("#assoc-stack") || qs("#associations-overlay .assoc-stack");
-    if (s1) s1.addEventListener("scroll", updateVisibility, { passive: true });
-    if (s2) s2.addEventListener("scroll", updateVisibility, { passive: true });
-  };
-  watchStacks();
-
-  btn.addEventListener("click", () => {
-    const scroller = activeScrollContainer();
-    if (scroller) {
-      scroller.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
+    btn.addEventListener("click", e => {
+      e.preventDefault();
+      if (isOverlayOpen()) return;
       window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  });
+    });
 
-  // initial state
-  updateVisibility();
-};
+    updateVisibility();
+  };
 
   // ---------------------------------------
   // DOM READY / LOAD
