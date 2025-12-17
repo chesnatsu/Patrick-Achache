@@ -296,8 +296,10 @@
     .hero-bg {
       position: absolute;
       inset: 0;
-      width: 100%;
-      height: 100%;
+      background-image: url("images/PA-Images/Website 1.png"); 
+      background-attachment: fixed;
+      background-size: cover;
+      filter: brightness(0.5);
       z-index: 0;
     }
 
@@ -1361,8 +1363,10 @@
       position: absolute;
       inset: 0;
       background-image: url("images/PA-Images/Buildings2.png"); 
-      background-size: cover;
+      background-attachment: fixed;
       background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
       filter: brightness(0.3);
       z-index: 0;
     }
@@ -1692,7 +1696,6 @@
       font-size: 14px;
       color: #222;
       background: #fff;
-      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25) inset, 0 4px 16px rgba(0, 0, 0, 0.12);
     }
 
     .contact-input::placeholder,
@@ -1719,7 +1722,6 @@
       letter-spacing: 0.12em;
       font-size: 13px;
       cursor: pointer;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
       transition: transform 0.15s ease, opacity 0.15s ease;
     }
 
@@ -1730,6 +1732,7 @@
     .sr-only {
       position: absolute !important;
       height: 1px;
+      border: none;
       width: 1px;
       overflow: hidden;
       clip: rect(1px, 1px, 1px, 1px);
@@ -1801,6 +1804,36 @@
 
     .animate-hero-left {
       animation: heroSlideFromLeft 0.9s ease-out forwards;
+    }
+    
+    .back-to-top{
+      position: fixed;
+      right: 18px;
+      bottom: 78px;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      font-size: 20px;
+      border: none;
+      background: #a8957b;
+      color: #fff;
+      cursor: pointer;
+      z-index: 9998;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .back-to-top:hover {
+      background: #8a7a63;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.227);
+    }
+
+    .back-to-top.is-visible{
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
     }
 
     footer {

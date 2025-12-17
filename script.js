@@ -1015,6 +1015,62 @@
 
     doc.addEventListener("click", () => shareMenu.classList.remove("open"));
   };
+const initBackToTop = () => {
+  const btn = qs("#backToTop");
+  if (!btn) return;
+
+  const stacks = [
+    () => qs("#charity-stack"),
+    () => qs("#assoc-stack"),
+    () => qs("#associations-overlay .assoc-stack")
+  ];
+
+  const activeScrollContainer = () => {
+    // if an overlay is visible, prefer its inner stack for scrolling
+    const charityOverlay = qs("#charity-overlay");
+    const assocOverlay = qs("#associations-overlay");
+
+    if (charityOverlay?.classList.contains("is-visible")) return stacks[0]();
+    if (assocOverlay?.classList.contains("is-visible"))
+      return stacks[1]() || stacks[2]();
+
+    return null;
+  };
+
+  const updateVisibility = () => {
+    const scroller = activeScrollContainer();
+
+    const top = scroller
+      ? scroller.scrollTop
+      : (window.scrollY || docEl.scrollTop || 0);
+
+    btn.classList.toggle("is-visible", top > 200);
+  };
+
+  // Track main page scroll
+  window.addEventListener("scroll", updateVisibility, { passive: true });
+
+  // Track overlay stacks scroll
+  const watchStacks = () => {
+    const s1 = qs("#charity-stack");
+    const s2 = qs("#assoc-stack") || qs("#associations-overlay .assoc-stack");
+    if (s1) s1.addEventListener("scroll", updateVisibility, { passive: true });
+    if (s2) s2.addEventListener("scroll", updateVisibility, { passive: true });
+  };
+  watchStacks();
+
+  btn.addEventListener("click", () => {
+    const scroller = activeScrollContainer();
+    if (scroller) {
+      scroller.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  });
+
+  // initial state
+  updateVisibility();
+};
 
   // ---------------------------------------
   // DOM READY / LOAD
@@ -1035,6 +1091,7 @@
     initCharityPagination();
     initAssocPagination();
     initCards();
+    initBackToTop();
     initAssociationsOverlays();
     initAssocCards();
     initAutoSlideCarousels();
