@@ -1809,7 +1809,7 @@
     .back-to-top{
       position: fixed;
       right: 18px;
-      bottom: 78px;
+      bottom: 18px;
       width: 44px;
       height: 44px;
       border-radius: 999px;
@@ -1870,89 +1870,6 @@
 
     .footer-copy {
       margin-top: 10px;
-    }
-
-    .recaptcha-float {
-      position: fixed !important;
-      right: 0 !important;
-      bottom: 16px !important;
-      border-radius: 5px 0 0 5px;
-      z-index: 9999;
-      box-shadow: 0 0 5px rgba(255,255,255,0.6);
-      font-family: Arial, sans-serif;
-    }
-
-    .recaptcha-inner {
-      display: flex;
-      align-items: center;
-      width: 55px;
-      height: 50px; 
-      background: #fff;
-      border-radius: 5px 0 0 5px;
-      box-shadow: 0 2px 6px rgba(0,0,0,.25);
-      overflow: hidden;
-      transition: width .3s ease;
-    }
-
-    .recaptcha-float:hover .recaptcha-inner {
-      width: 200px;
-      background: #1a73e8;
-      height: 50px;
-    }
-    
-    .recaptcha-icon {
-      width: 44px;
-      height: 44px;
-    }
-    
-    .recaptcha-logo {
-      min-width: 55px;
-      height: 55px;
-      display: flex;
-      border-radius: 5px 0 0 5px;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #fff;
-    }
-
-    .recaptcha-logo::after {
-      content: "Privacy - Terms";
-      font-size: 7px;
-      color: gray;
-      margin-bottom: 5px;
-    }
-
-    .recaptcha-float:hover .recaptcha-logo::after {
-      display: none;
-    }
-
-    .recaptcha-text {
-      opacity: 0;
-      margin-left: 9px;
-      white-space: nowrap;
-      font-size: 12px;
-      color: #fff;
-    }
-
-    .recaptcha-float:hover .recaptcha-text {
-      opacity: 1;
-    }
-
-    .recaptcha-text > span {
-      font-size: 11px;
-      font-family: Roboto, helvetica, arial, sans-serif;
-    }
-
-    .recaptcha-links {
-      font-family: Roboto, helvetica, arial, sans-serif;
-      width: 70px;
-      font-size: 10px;
-      margin-top: 3px;
-    }
-
-    .recaptcha-links a:hover {
-      text-decoration: underline;
     }
 
     /* =========================
