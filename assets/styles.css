@@ -1632,7 +1632,7 @@
 
     .contact {
       position: relative;
-      min-height: 87vh;
+      min-height: 82.6vh;
       background: var(--bg-dark);
       color: #fff;
       display: flex;
@@ -1845,6 +1845,33 @@
       color: #eee;
     }
 
+    .footer-links {
+      margin-bottom: 10px;
+    }
+
+    .footer-links a {
+      color: #9c907e;
+      text-decoration: none;
+      margin: 0 5px;
+    }
+
+    .footer-links a:hover {
+      color: #88693d;
+      transition: color 0.5s ease;
+    }
+
+    .footer-line {
+      width: 100%;
+      max-width: 400px;
+      margin: 10px auto;
+      border: none;
+      border-top: 1px solid rgba(150, 111, 68, 0.2);
+    }
+
+    .footer-copy {
+      margin-top: 10px;
+    }
+
     .recaptcha-float {
       position: fixed !important;
       right: 0 !important;
@@ -1872,10 +1899,12 @@
       background: #1a73e8;
       height: 50px;
     }
+    
     .recaptcha-icon {
       width: 44px;
       height: 44px;
     }
+    
     .recaptcha-logo {
       min-width: 55px;
       height: 55px;
