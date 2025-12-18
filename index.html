@@ -4070,44 +4070,48 @@
     emailjs.init({ publicKey: "uelTOKuwbo0YX28lb" });
 
     function sendMail(event) {
-      event.preventDefault();
+    event.preventDefault();
 
-      const btn = document.getElementById("contact-btn");
-      const form = document.querySelector(".contact-form");
+    const btn = document.getElementById("contact-btn");
+    const form = document.querySelector(".contact-form");
 
-      const fields = {
-        first: document.getElementById("first").value.trim(),
-        last: document.getElementById("last").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        subject: document.getElementById("subject").value.trim(),
-        message: document.getElementById("message").value.trim(),
-      };
+    const fields = {
+      first: document.getElementById("first").value.trim(),
+      last: document.getElementById("last").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      subject: document.getElementById("subject").value.trim(),
+      message: document.getElementById("message").value.trim(),
+    };
 
-      if (!fields.email || !fields.subject || !fields.message) {
-        return;
-      }
+    if (!fields.email || !fields.subject || !fields.message) return;
 
-      const setButtonState = (loading) => {
-        btn.textContent = loading ? "Submitting..." : "SUBMIT";
-        btn.disabled = loading;
-      };
+    const setButtonState = (loading) => {
+      btn.textContent = loading ? "Submitting..." : "SUBMIT";
+      btn.disabled = loading;
+    };
 
-      setButtonState(true);
+    setButtonState(true);
 
-      emailjs
-        .send("service_8blvy2j", "template_1m0n517", fields)
-        .then(() => {
-          form.reset();
-          setButtonState(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          setButtonState(false);
+    // Get reCAPTCHA token
+    grecaptcha.ready(() => {
+      grecaptcha.execute('6Lc4Wi8sAAAAAHLfTZ5mhP4XP73zFdKXst0cMHCZ', { action: 'contact_form' })
+        .then((token) => {
+          // Add token to the fields
+          fields['recaptchaToken'] = token;
+
+          // Send via EmailJS
+          emailjs.send("service_8blvy2j", "template_1m0n517", fields)
+            .then(() => {
+              form.reset();
+              setButtonState(false);
+            })
+            .catch((err) => {
+              console.error(err);
+              setButtonState(false);
+            });
         });
-    }
-  grecaptcha.ready(() => {
-    grecaptcha.execute('6Lc4Wi8sAAAAAHLfTZ5mhP4XP73zFdKXst0cMHCZ', { action: 'page_view' });
-  });
+    });
+  }
 </script>
 
 </body>
