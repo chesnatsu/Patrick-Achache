@@ -1809,7 +1809,7 @@
     .back-to-top{
       position: fixed;
       right: 18px;
-      bottom: 18px;
+      bottom: 80px;
       width: 44px;
       height: 44px;
       border-radius: 999px;
@@ -1834,6 +1834,22 @@
       opacity: 1;
       transform: translateY(0);
       pointer-events: auto;
+    }
+
+    .recaptcha-notice {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1a73e8;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    .recaptcha-notice a {
+      color: #fff;
+      text-decoration: underline;
     }
 
     footer {

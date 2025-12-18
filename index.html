@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="assets/styles.css">
   <script src="script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js?render=6Lc4Wi8sAAAAAHLfTZ5mhP4XP73zFdKXst0cMHCZ"></script>
 
 </head>
 
@@ -4053,7 +4054,7 @@
     </section>
     <button id="backToTop" class="back-to-top" type="button" aria-label="Back to top"> ↑ </button>
 </main>
-  
+
 <footer class="footer">
   <div class="footer-links">
     <a href="https://newalchemysolutions.com/privacy-policy/">Privacy Policy / Legal Notice</a>
@@ -4104,6 +4105,9 @@
           setButtonState(false);
         });
     }
+  grecaptcha.ready(() => {
+    grecaptcha.execute('6Lc4Wi8sAAAAAHLfTZ5mhP4XP73zFdKXst0cMHCZ', { action: 'page_view' });
+  });
 </script>
 
 </body>
