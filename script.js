@@ -1081,8 +1081,9 @@
     setButtonState(true);
 
     grecaptcha.ready(() => {
-      grecaptcha.execute('6Lc4Wi8sAAAAAHLfTZ5mhP4XP73zFdKXst0cMHCZ', { action: 'contact_form' })
+      grecaptcha.execute('6LevrzAsAAAAAP2hYP_jCSQQeSfVZmnWyilUabtf', { action: 'contact_form' })
         .then((token) => {
+          console.log("reCAPTCHA token:", token);
           fields['recaptchaToken'] = token;
 
           emailjs.send("service_8blvy2j", "template_1m0n517", fields)
