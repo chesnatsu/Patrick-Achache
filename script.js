@@ -1098,6 +1098,23 @@
     });
   }
 
+  // ---------------------------
+  // Google Analytics (GA4)
+  // ---------------------------
+  (function() {
+    // Load GA script asynchronously
+    const gaScript = document.createElement('script');
+    gaScript.async = true;
+    gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-95N276228J';
+    document.head.appendChild(gaScript);
+
+    // Initialize GA
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-95N276228J');
+  })();
+
   // ---------------------------------------
   // DOM READY / LOAD
   // ---------------------------------------
