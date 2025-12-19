@@ -1048,11 +1048,64 @@
   };
 
   // ---------------------------------------
+  // Contact Form Initialization
+  // ---------------------------------------
+  function initContactForm() {
+    const form = document.querySelector(".contact-form");
+    if (form) {
+      form.addEventListener("submit", sendMail);
+    }
+  }
+
+  function sendMail(event) {
+    event.preventDefault();
+
+    const btn = document.getElementById("contact-btn");
+    const form = document.querySelector(".contact-form");
+
+    const fields = {
+      first: document.getElementById("first").value.trim(),
+      last: document.getElementById("last").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      subject: document.getElementById("subject").value.trim(),
+      message: document.getElementById("message").value.trim(),
+    };
+
+    if (!fields.email || !fields.subject || !fields.message) return;
+
+    const setButtonState = (loading) => {
+      btn.textContent = loading ? "Submitting..." : "SUBMIT";
+      btn.disabled = loading;
+    };
+
+    setButtonState(true);
+
+    grecaptcha.ready(() => {
+      grecaptcha.execute('6Lc4Wi8sAAAAAHLfTZ5mhP4XP73zFdKXst0cMHCZ', { action: 'contact_form' })
+        .then((token) => {
+          fields['recaptchaToken'] = token;
+
+          emailjs.send("service_8blvy2j", "template_1m0n517", fields)
+            .then(() => {
+              form.reset();
+              setButtonState(false);
+            })
+            .catch((err) => {
+              console.error(err);
+              setButtonState(false);
+            });
+        });
+    });
+  }
+
+  // ---------------------------------------
   // DOM READY / LOAD
   // ---------------------------------------
   doc.addEventListener("DOMContentLoaded", () => {
     body = doc.body;
 
+    emailjs.init("uelTOKuwbo0YX28lb");
+    
     const yearSpan = qs("#year");
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
@@ -1073,6 +1126,7 @@
     initOverlayBackdropClose();
     initCompaniesCarousel();
     initLightbox();
+    initContactForm();
 
     setTimeout(hideLoaderAndRevealContent, 200);
   });

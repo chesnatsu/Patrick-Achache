@@ -56,13 +56,13 @@
         </div>
     </section>
 
-    <!-- ABOUT SECTION (always visible) -->
-    <section id="about" class="about container" data-section="about">
-      <div class="about-main">
-        <div class="copy animate-hidden">
-          <h1 class="display title">About</h1>
+    <!-- ABOUT SECTION -->
+    <section id="about" class="about" data-section="about">
+        <div class="about-main container">
+          <div class="copy animate-hidden">
+            <h1 class="display title">About</h1>
 
-          <p class="kicker">
+           <p class="kicker">
             BRIDGING TECHNOLOGY, BUSINESS<br />
             AND PURPOSE
           </p>
@@ -71,7 +71,6 @@
             Applying years of expertise in consulting, anti-piracy, and global development.
           </p>
 
-          <!-- Opens About Me overlay -->
           <button class="btn js-about-open">Read more</button>
         </div>
 
@@ -84,11 +83,10 @@
             <img src="assets/images/PA-Images/DSC_6349-scaled.png" alt="">
           </figure>
         </div>
-
       </div>
     </section>
 
-    <!-- ABOUT ME OVERLAY (was AboutMe.vue) -->
+    <!-- ABOUT ME OVERLAY -->
     <section id="aboutme-overlay" class="aboutme-overlay">
       <img class="aboutme-bg" src="assets/images/PA-Images/Buildings.png" alt="">
       <div class="container aboutme-inner">
@@ -3504,7 +3502,6 @@
                    Despite the rainy weather, the spirit of the day remained bright. We extend our heartfelt gratitude to everyone who ran, walked, donated, volunteered, or cheered. Beyond the funds raised and awareness spread, this event was a powerful reminder of the strength and diversity of the community that believes in Mirai no Mori’s mission and in the potential of the children we support. Special thanks to KIWL, Eco Marathon, Ai Sakura, and Patrick Achache for their key roles in making this year’s Charity Run a success. We look forward to welcoming everyone back next year as we continue building a brighter future together, one step at a time.
                 </p>
 
-
               </div>
             </div>
 
@@ -4026,7 +4023,6 @@
           <p class="contact-lede">I would be happy to hear from you.</p>
         </div>
 
-        <!-- form only HTML/CSS; hook up to your backend/Formspree later -->
         <form class="contact-form" onsubmit="sendMail(event)">
           <div class="contact-row">
             <label class="sr-only" for="first">First name</label>
@@ -4052,67 +4048,20 @@
         </form>
       </div>
     </section>
+    
     <button id="backToTop" class="back-to-top" type="button" aria-label="Back to top"> ↑ </button>
-</main>
 
-<footer class="footer">
-  <div class="footer-links">
-    <a href="https://newalchemysolutions.com/privacy-policy/">Privacy Policy / Legal Notice</a>
-  </div>
-  <hr class="footer-line">
-  <div class="footer-copy">
-    <b>Patrick Achache</b> © <span id="year"></span>. All Rights Reserved.
-  </div>
-</footer>
+  </main>
 
-  <script>
-    // Initialize EmailJS
-    emailjs.init({ publicKey: "uelTOKuwbo0YX28lb" });
-
-    function sendMail(event) {
-    event.preventDefault();
-
-    const btn = document.getElementById("contact-btn");
-    const form = document.querySelector(".contact-form");
-
-    const fields = {
-      first: document.getElementById("first").value.trim(),
-      last: document.getElementById("last").value.trim(),
-      email: document.getElementById("email").value.trim(),
-      subject: document.getElementById("subject").value.trim(),
-      message: document.getElementById("message").value.trim(),
-    };
-
-    if (!fields.email || !fields.subject || !fields.message) return;
-
-    const setButtonState = (loading) => {
-      btn.textContent = loading ? "Submitting..." : "SUBMIT";
-      btn.disabled = loading;
-    };
-
-    setButtonState(true);
-
-    // Get reCAPTCHA token
-    grecaptcha.ready(() => {
-      grecaptcha.execute('6Lc4Wi8sAAAAAHLfTZ5mhP4XP73zFdKXst0cMHCZ', { action: 'contact_form' })
-        .then((token) => {
-          // Add token to the fields
-          fields['recaptchaToken'] = token;
-
-          // Send via EmailJS
-          emailjs.send("service_8blvy2j", "template_1m0n517", fields)
-            .then(() => {
-              form.reset();
-              setButtonState(false);
-            })
-            .catch((err) => {
-              console.error(err);
-              setButtonState(false);
-            });
-        });
-    });
-  }
-</script>
+  <footer>
+    <div class="footer-links">
+      <a href="https://newalchemysolutions.com/privacy-policy/">Privacy Policy / Legal Notice</a>
+    </div>
+    <hr class="footer-line">
+    <div class="footer-copy">
+      <b>Patrick Achache</b> © <span id="year"></span>. All Rights Reserved.
+    </div>
+  </footer>
 
 </body>
 </html>
