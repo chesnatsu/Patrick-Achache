@@ -44,6 +44,29 @@
       display: none;       
     }
 
+    /* Scroll reveal base state */
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .5s ease, transform .6s ease;
+      will-change: opacity, transform;
+    }
+
+    /* Revealed state */
+    [data-reveal].is-revealed {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* If user prefers reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+    }
+
     #loader {
       position: fixed;
       inset: 0;            
