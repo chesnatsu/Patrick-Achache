@@ -42,7 +42,17 @@
     html::-webkit-scrollbar {
       display: none;       
     }
+    
+    html.reveal-ready [data-reveal] {
+      opacity: 0;
+      transform: translateY(18px);
+      will-change: transform, opacity;
+    }
 
+    html.reveal-ready [data-reveal].is-revealed {
+      opacity: 1;
+      transform: none;
+    }
     #loader {
       position: fixed;
       inset: 0;            

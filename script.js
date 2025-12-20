@@ -163,14 +163,7 @@
       // reveal sections
       revealSectionsInOrder();
       animateHero();
-
-      // ✅ Wait 2 frames so layout/paint is correct before observing
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          initScrollReveal();
-        });
-      });
-    }, 400);
+    });
   };
 
   const unlockScrollAfterAssets = () => {
@@ -1122,36 +1115,28 @@
       gtag('config', 'G-95N276228J');
     })();
 
-    const waitForImgEl = (imgEl) => {
-      if (!imgEl) return Promise.resolve();
-      if (imgEl.complete) return Promise.resolve();
-      return new Promise((res) => {
-        imgEl.addEventListener("load", res, { once: true });
-        imgEl.addEventListener("error", res, { once: true });
-      });
-    };
-
-    const preloadImage = (url) =>
-      new Promise((res) => {
-        const img = new Image();
-        img.onload = res;
-        img.onerror = res;
-        img.src = url;
-      });
-
     // ---------- SCROLL REVEAL (IntersectionObserver) ----------
+
     const initScrollReveal = () => {
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const els = [...qsa("[data-reveal]")];
+      const isMobile = window.matchMedia("(max-width: 900px)").matches;
       if (!els.length) return;
 
-      // Mobile-friendly settings
-      const isMobile = window.matchMedia("(max-width: 900px)").matches;
-
+      // If user prefers reduced motion, just show everything
       if (reduceMotion) {
-        els.forEach(el => el.classList.add("is-revealed"));
+        els.forEach(el => {
+          el.classList.add("is-revealed");
+        });
         return;
       }
+
+      // Ensure base state is applied (in case HTML loads mid-scroll)
+      els.forEach(el => {
+        if (!el.classList.contains("is-revealed")) {
+          // keep hidden until reveal
+        }
+      });
 
       const dirToAnimClass = (dir) => {
         switch ((dir || "").toLowerCase()) {
@@ -1167,49 +1152,44 @@
         (entries) => {
           entries.forEach(entry => {
             if (!entry.isIntersecting) return;
-            if (anyOverlayOpen()) return;
 
             const el = entry.target;
             const dir = el.getAttribute("data-reveal") || "bottom";
             const animClass = dirToAnimClass(dir);
 
+            // mark revealed
             el.classList.add("is-revealed");
 
-            // re-trigger animation cleanly
+            // trigger your existing keyframe animation safely
             el.classList.remove(...ANIM_CLASSES);
-            void el.offsetWidth;
+            void el.offsetWidth; // restart animation
             el.classList.add(animClass);
 
-            el.addEventListener(
-              "animationend",
-              () => el.classList.remove(animClass),
-              { once: true }
-            );
+            el.addEventListener("animationend", () => el.classList.remove(animClass), { once: true });
 
+            // reveal once (change to false if you want it to re-animate every time)
             io.unobserve(el);
-            
           });
         },
         {
-          root: null,
-          rootMargin: isMobile ? "0px 0px -5% 0px" : "0px 0px -12% 0px",
-          threshold: isMobile ? 0.06 : 0.12
+              root: null,
+              rootMargin: isMobile ? "0px 0px -5% 0px" : "0px 0px -12% 0px",
+              threshold: isMobile ? 0.06 : 0.12
         }
       );
 
       els.forEach(el => io.observe(el));
     };
 
+
   // ---------------------------------------
   // DOM READY / LOAD
   // ---------------------------------------
   doc.addEventListener("DOMContentLoaded", () => {
     body = doc.body;
-
+    
     emailjs.init("uelTOKuwbo0YX28lb");
     
-    const heroPortrait = document.querySelector("#home .hero-portrait");
-    const heroBgUrl = "images/PA-Images/Website 1.png"; 
 
     const yearSpan = qs("#year");
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
@@ -1232,18 +1212,10 @@
     initCompaniesCarousel();
     initLightbox();
     initContactForm();
+    initScrollReveal();
 
-    Promise.race([
-      Promise.all([
-        waitForImgEl(heroPortrait),
-        preloadImage(heroBgUrl)
-      ]),
-      
-        new Promise((res) => setTimeout(res, 200))
-      ]).then(() => {
-        hideLoaderAndRevealContent();
+      setTimeout(hideLoaderAndRevealContent, 200);
     });
-  });
 
   window.addEventListener("load", unlockScrollAfterAssets);
 })();
