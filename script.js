@@ -1193,16 +1193,17 @@
       img.src = src;
     });
 
-  const preloadHeroAssets = () => {
-    const heroPortrait = document.querySelector(".hero-portrait");
-    const portraitSrc = heroPortrait?.currentSrc || heroPortrait?.src;
+    const preloadHeroAssets = () => {
+      const heroPortrait = document.querySelector(".hero-portrait");
+      const portraitSrc = heroPortrait?.currentSrc || heroPortrait?.src;
 
-    // 🔥 hard-code the hero bg so timing can't break
-    const heroBgSrc = "images/PA-Images/Website 1.png";
+      const heroBgSrc = "images/PA-Images/Website 1.png";
 
-    preloadImage(heroBgSrc);
-    preloadImage(portraitSrc);
-  };
+      return Promise.all([
+        preloadImage(heroBgSrc),
+        preloadImage(portraitSrc)
+      ]);
+    };
 
   // ---------------------------------------
   // DOM READY / LOAD
@@ -1231,10 +1232,10 @@
     initCompaniesCarousel();
     initLightbox();
     initContactForm();
-    preloadHeroAssets();
-
+    preloadHeroAssets().then(() => {
+    // small delay keeps your loader smooth
     setTimeout(hideLoaderAndRevealContent, 200);
+   });
   });
-
   window.addEventListener("load", unlockScrollAfterAssets);
 })();
