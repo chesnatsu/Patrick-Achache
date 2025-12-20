@@ -1174,7 +1174,7 @@
 
     els.forEach(el => io.observe(el));
   };
-  
+
   const preloadImage = (src) =>
     new Promise((resolve) => {
       if (!src) return resolve();
@@ -1199,7 +1199,7 @@
   // ---------------------------------------
   // DOM READY / LOAD
   // ---------------------------------------
-  doc.addEventListener("DOMContentLoaded", async() => {
+  doc.addEventListener("DOMContentLoaded", () => {
     body = doc.body;
 
     emailjs.init("uelTOKuwbo0YX28lb");
@@ -1225,10 +1225,10 @@
     initCompaniesCarousel();
     initLightbox();
     initContactForm();
+    initScrollReveal(); 
+    preloadHeroAssets();
 
-    await preloadHeroAssets();
-    hideLoaderAndRevealContent();
-    initScrollReveal();  
+    setTimeout(hideLoaderAndRevealContent, 200);    
   });
 
   window.addEventListener("load", unlockScrollAfterAssets);
