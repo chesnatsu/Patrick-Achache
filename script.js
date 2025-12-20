@@ -151,20 +151,27 @@
   // LOADER + INITIAL SCROLL CONTROL
   // ---------------------------------------
   const hideLoaderAndRevealContent = () => {
-    if (contentRevealed) return;
+    const loader = qs("#loader");
+    if (!loader || contentRevealed) return;
     contentRevealed = true;
 
-    const loader = qs("#loader");
-    if (loader && !loader.classList.contains("fade-out")) {
-      loader.classList.add("fade-out");
-      setTimeout(() => {
-        loader.style.display = "none";
-      }, 400);
-    }
+    loader.classList.add("fade-out");
 
-    revealSectionsInOrder();
-    animateHero();
+    setTimeout(() => {
+      loader.style.display = "none";
+
+      // reveal sections
+      revealSectionsInOrder();
+      animateHero();
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          initScrollReveal();
+        });
+      });
+    }, 400);
   };
+
   
 
   const unlockScrollAfterAssets = () => {
@@ -1123,17 +1130,12 @@
     const els = [...qsa("[data-reveal]")];
     if (!els.length) return;
 
-    if (reduceMotion) {
-      els.forEach(el => {
-        el.classList.add("is-revealed");
-      });
+    const filtered = els.filter(el => !el.closest(ALL_OVERLAYS_SELECTOR));
+
+    if (!("IntersectionObserver" in window) || reduceMotion) {
+      filtered.forEach(el => el.classList.add("is-revealed"));
       return;
     }
-
-    els.forEach(el => {
-      if (!el.classList.contains("is-revealed")) {
-      }
-    });
 
     const dirToAnimClass = (dir) => {
       switch ((dir || "").toLowerCase()) {
@@ -1160,7 +1162,11 @@
           void el.offsetWidth;
           el.classList.add(animClass);
 
-          el.addEventListener("animationend", () => el.classList.remove(animClass), { once: true });
+          el.addEventListener(
+            "animationend",
+            () => el.classList.remove(animClass),
+            { once: true }
+          );
 
           io.unobserve(el);
         });
@@ -1172,7 +1178,7 @@
       }
     );
 
-    els.forEach(el => io.observe(el));
+    filtered.forEach(el => io.observe(el));
   };
 
   const preloadImage = (src) =>
@@ -1180,21 +1186,20 @@
       if (!src) return resolve();
       const img = new Image();
       img.onload = resolve;
-      img.onerror = resolve; 
+      img.onerror = resolve;
       img.src = src;
     });
 
   const preloadHeroAssets = () => {
-    const heroPortraitEl = document.querySelector(".hero-portrait");
-    const heroPortraitUrl = heroPortraitEl?.currentSrc || heroPortraitEl?.src || "";
+    const heroPortrait = document.querySelector(".hero-portrait");
+    const portraitSrc = heroPortrait?.currentSrc || heroPortrait?.src;
 
-    const heroBgUrl = "images/PA-Images/Website 1.png";
+    const heroBgSrc = "images/PA-Images/Website 1.png";
 
-    return Promise.all([
-      preloadImage(heroBgUrl),
-      preloadImage(heroPortraitUrl),
-    ]);
+    preloadImage(heroBgSrc);
+    preloadImage(portraitSrc);
   };
+
 
   // ---------------------------------------
   // DOM READY / LOAD
@@ -1225,7 +1230,6 @@
     initCompaniesCarousel();
     initLightbox();
     initContactForm();
-    initScrollReveal(); 
     preloadHeroAssets();
 
     setTimeout(hideLoaderAndRevealContent, 200);    
