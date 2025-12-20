@@ -61,7 +61,28 @@
       pointer-events: none;
     }
 
+    /* Scroll-reveal base state */
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(14px);
+      will-change: transform, opacity;
+    }
 
+    /* When revealed, let your keyframes handle the animation */
+    [data-reveal].is-revealed {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+        animation: none !important;
+      }
+    }
 
     /* The spinner circle */
     .spinner {
