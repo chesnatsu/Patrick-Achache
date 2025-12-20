@@ -43,6 +43,20 @@
     html::-webkit-scrollbar {
       display: none;       
     }
+    
+   html.page-loading body > *:not(#loader) {
+  visibility: hidden;
+}
+
+html.page-loading #loader {
+  visibility: visible;
+}
+
+/* Prevent white flash */
+html.page-loading,
+body.page-loading {
+  background: #1f1a14;
+}
 
     /* Scroll reveal base state */
     [data-reveal] {
@@ -75,7 +89,7 @@
       justify-content: center;
       background: #1f1a14;      
       z-index: 9999;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
+      transition: opacity 0.18s ease, visibility 0.18s ease;
     }
 
     #loader.fade-out {

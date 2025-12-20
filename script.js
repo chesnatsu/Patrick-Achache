@@ -170,7 +170,7 @@
           initScrollReveal();
         });
       });
-    }, 400);
+    }, 200);
   };
 
 
@@ -1247,7 +1247,7 @@ const preloadHeroAssets = () => {
   initNavLinksBehavior();
   // ... all your init calls ...
 
-  const FAILSAFE_MS = 3000;
+  const FAILSAFE_MS = 200;
 
   Promise.race([
     preloadHeroAssets(),
