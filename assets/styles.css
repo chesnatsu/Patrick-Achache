@@ -61,26 +61,7 @@
       pointer-events: none;
     }
 
-    /* Scroll-reveal base state */
-    [data-reveal] {
-      opacity: 0;
-      transform: translateY(14px);
-      will-change: transform, opacity;
-    }
 
-    [data-reveal].is-revealed {
-      opacity: 1;
-      transform: none;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      [data-reveal] {
-        opacity: 1 !important;
-        transform: none !important;
-        transition: none !important;
-        animation: none !important;
-      }
-    }
 
     /* The spinner circle */
     .spinner {
@@ -114,7 +95,6 @@
       top: 0;
       left: 0;
       width: 100%;  
-      padding: 3px;
       background: #ffffff;
       max-width: 100%;
       opacity: 1;

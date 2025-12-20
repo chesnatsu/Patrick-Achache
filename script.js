@@ -1116,64 +1116,7 @@
     gtag('config', 'G-95N276228J');
   })();
 
-  // ---------- SCROLL REVEAL (IntersectionObserver) ----------
 
-  const initScrollReveal = () => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const els = [...qsa("[data-reveal]")];
-    if (!els.length) return;
-
-    if (reduceMotion) {
-      els.forEach(el => {
-        el.classList.add("is-revealed");
-      });
-      return;
-    }
-
-    els.forEach(el => {
-      if (!el.classList.contains("is-revealed")) {
-      }
-    });
-
-    const dirToAnimClass = (dir) => {
-      switch ((dir || "").toLowerCase()) {
-        case "right": return "animate-from-right";
-        case "top": return "animate-from-top";
-        case "bottom": return "animate-from-bottom";
-        case "left":
-        default: return "animate-from-left";
-      }
-    };
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-
-          const el = entry.target;
-          const dir = el.getAttribute("data-reveal") || "bottom";
-          const animClass = dirToAnimClass(dir);
-
-          el.classList.add("is-revealed");
-
-          el.classList.remove(...ANIM_CLASSES);
-          void el.offsetWidth;
-          el.classList.add(animClass);
-
-          el.addEventListener("animationend", () => el.classList.remove(animClass), { once: true });
-
-          io.unobserve(el);
-        });
-      },
-      {
-        root: null,
-        rootMargin: "0px 0px -12% 0px",
-        threshold: 0.12
-      }
-    );
-
-    els.forEach(el => io.observe(el));
-  };
 
   // ---------------------------------------
   // DOM READY / LOAD
@@ -1204,7 +1147,6 @@
     initCompaniesCarousel();
     initLightbox();
     initContactForm();
-    initScrollReveal();
 
     setTimeout(hideLoaderAndRevealContent, 200);
   });
