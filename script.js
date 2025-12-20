@@ -1184,26 +1184,36 @@
     filtered.forEach(el => io.observe(el));
   };
 
-  const preloadImage = (src) =>
-    new Promise((resolve) => {
-      if (!src) return resolve();
-      const img = new Image();
-      img.onload = resolve;
-      img.onerror = resolve;
-      img.src = src;
-    });
+const extractCssUrl = (bgValue) => {
+  // bgValue example: url("...") or none
+  const match = /url\(["']?(.*?)["']?\)/.exec(bgValue || "");
+  return match ? match[1] : "";
+};
 
-    const preloadHeroAssets = () => {
-      const heroPortrait = document.querySelector(".hero-portrait");
-      const portraitSrc = heroPortrait?.currentSrc || heroPortrait?.src;
+const preloadImage = (src) =>
+  new Promise((resolve) => {
+    if (!src) return resolve();
+    const img = new Image();
+    img.onload = resolve;
+    img.onerror = resolve;
+    img.src = src;
+  });
 
-      const heroBgSrc = "images/PA-Images/Website 1.png";
+const preloadHeroAssets = () => {
+  const heroBgEl = document.querySelector(".hero-bg");
+  const heroPortrait = document.querySelector(".hero-portrait");
 
-      return Promise.all([
-        preloadImage(heroBgSrc),
-        preloadImage(portraitSrc)
-      ]);
-    };
+  const bgCss = heroBgEl ? getComputedStyle(heroBgEl).backgroundImage : "";
+  const heroBgSrc = extractCssUrl(bgCss);
+
+  const portraitSrc = heroPortrait?.currentSrc || heroPortrait?.src;
+
+  return Promise.all([
+    preloadImage(heroBgSrc),
+    preloadImage(portraitSrc),
+  ]);
+};
+
 
   // ---------------------------------------
   // DOM READY / LOAD
@@ -1232,10 +1242,21 @@
     initCompaniesCarousel();
     initLightbox();
     initContactForm();
-    preloadHeroAssets().
-   
+     // everything can initialize normally here
+  initHistoryOverlayHandling();
+  initNavLinksBehavior();
+  // ... all your init calls ...
+
+  const FAILSAFE_MS = 3000;
+
+  Promise.race([
+    preloadHeroAssets(),
+    new Promise((r) => setTimeout(r, FAILSAFE_MS))
+  ]).then(() => {
+    // ✅ keep this
     setTimeout(hideLoaderAndRevealContent, 200);
-   });
-  
-  window.addEventListener("load", unlockScrollAfterAssets);
+  });
+});
+
+window.addEventListener("load", unlockScrollAfterAssets);
 })();
