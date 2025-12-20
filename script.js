@@ -151,21 +151,27 @@
   // LOADER + INITIAL SCROLL CONTROL
   // ---------------------------------------
   const hideLoaderAndRevealContent = () => {
-    if (contentRevealed) return;
+    const loader = qs("#loader");
+    if (!loader || contentRevealed) return;
     contentRevealed = true;
 
-    const loader = qs("#loader");
-    if (loader && !loader.classList.contains("fade-out")) {
-      loader.classList.add("fade-out");
-      setTimeout(() => {
-        loader.style.display = "none";
-      }, 400);
-    }
+    loader.classList.add("fade-out");
 
-    revealSectionsInOrder();
-    animateHero();
+    setTimeout(() => {
+      loader.style.display = "none";
+
+      // reveal sections
+      revealSectionsInOrder();
+      animateHero();
+
+      // ✅ Wait 2 frames so layout/paint is correct before observing
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          initScrollReveal();
+        });
+      });
+    }, 400);
   };
-  
 
   const unlockScrollAfterAssets = () => {
     if (scrollUnlocked) return;
@@ -1111,27 +1117,87 @@
 
     // Initialize GA
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-95N276228J');
-  })();
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-95N276228J');
+    })();
 
-const waitForImgEl = (imgEl) => {
-  if (!imgEl) return Promise.resolve();
-  if (imgEl.complete) return Promise.resolve();
-  return new Promise((res) => {
-    imgEl.addEventListener("load", res, { once: true });
-    imgEl.addEventListener("error", res, { once: true });
-  });
-};
+    const waitForImgEl = (imgEl) => {
+      if (!imgEl) return Promise.resolve();
+      if (imgEl.complete) return Promise.resolve();
+      return new Promise((res) => {
+        imgEl.addEventListener("load", res, { once: true });
+        imgEl.addEventListener("error", res, { once: true });
+      });
+    };
 
-const preloadImage = (url) =>
-  new Promise((res) => {
-    const img = new Image();
-    img.onload = res;
-    img.onerror = res;
-    img.src = url;
-  });
+    const preloadImage = (url) =>
+      new Promise((res) => {
+        const img = new Image();
+        img.onload = res;
+        img.onerror = res;
+        img.src = url;
+      });
+
+    const initScrollReveal = () => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const els = [...qsa("[data-reveal]")];
+    if (!els.length) return;
+
+    // ✅ Never reveal items inside overlays by default (optional but recommended)
+    const filtered = els.filter(el => !el.closest(ALL_OVERLAYS_SELECTOR));
+
+    // Fallback for older browsers
+    if (!("IntersectionObserver" in window) || reduceMotion) {
+      filtered.forEach(el => el.classList.add("is-revealed"));
+      return;
+    }
+
+    const dirToAnimClass = (dir) => {
+      switch ((dir || "").toLowerCase()) {
+        case "right": return "animate-from-right";
+        case "top": return "animate-from-top";
+        case "bottom": return "animate-from-bottom";
+        case "left":
+        default: return "animate-from-left";
+      }
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+
+          const el = entry.target;
+          const dir = el.getAttribute("data-reveal") || "bottom";
+          const animClass = dirToAnimClass(dir);
+
+          // ✅ reveal base
+          el.classList.add("is-revealed");
+
+          // ✅ optional: also trigger your keyframe animation once
+          el.classList.remove(...ANIM_CLASSES);
+          void el.offsetWidth;
+          el.classList.add(animClass);
+
+          el.addEventListener(
+            "animationend",
+            () => el.classList.remove(animClass),
+            { once: true }
+          );
+
+          io.unobserve(el);
+        });
+      },
+      {
+        root: null,
+        rootMargin: "0px 0px -12% 0px",
+        threshold: 0.12
+      }
+    );
+
+    filtered.forEach(el => io.observe(el));
+  };
 
   // ---------------------------------------
   // DOM READY / LOAD
@@ -1166,16 +1232,16 @@ const preloadImage = (url) =>
     initLightbox();
     initContactForm();
 
-   Promise.race([
-  Promise.all([
-    waitForImgEl(heroPortrait),
-    preloadImage(heroBgUrl)
-  ]),
-  // fallback so loader never gets stuck forever
-  new Promise((res) => setTimeout(res, 200))
-]).then(() => {
-  hideLoaderAndRevealContent();
-});
+    Promise.race([
+      Promise.all([
+        waitForImgEl(heroPortrait),
+        preloadImage(heroBgUrl)
+      ]),
+      
+        new Promise((res) => setTimeout(res, 200))
+      ]).then(() => {
+        hideLoaderAndRevealContent();
+    });
   });
 
   window.addEventListener("load", unlockScrollAfterAssets);
