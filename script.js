@@ -1080,7 +1080,7 @@
     setButtonState(true);
 
     grecaptcha.ready(() => {
-      grecaptcha.execute('6LevrzAsAAAAAP2hYP_jCSQQeSfVZmnWyilUabtf', { action: 'contact_form' })
+      grecaptcha.execute('6LehdjEsAAAAAH0HrlgUhbJmAg4OwtxBoGCtBgO4', { action: 'contact_form' })
         .then((token) => {
           console.log("reCAPTCHA token:", token);
           fields['recaptchaToken'] = token;
@@ -1211,6 +1211,6 @@
 
     setTimeout(hideLoaderAndRevealContent, 200);
     });
-    
+
   window.addEventListener("load", unlockScrollAfterAssets);
 })();
