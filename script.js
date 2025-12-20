@@ -1139,65 +1139,66 @@
         img.src = url;
       });
 
+    // ---------- SCROLL REVEAL (IntersectionObserver) ----------
     const initScrollReveal = () => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const els = [...qsa("[data-reveal]")];
-    if (!els.length) return;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const els = [...qsa("[data-reveal]")];
+      if (!els.length) return;
 
-    // ✅ Never reveal items inside overlays by default (optional but recommended)
-    const filtered = els.filter(el => !el.closest(ALL_OVERLAYS_SELECTOR));
+      // Mobile-friendly settings
+      const isMobile = window.matchMedia("(max-width: 900px)").matches;
 
-    // Fallback for older browsers
-    if (!("IntersectionObserver" in window) || reduceMotion) {
-      filtered.forEach(el => el.classList.add("is-revealed"));
-      return;
-    }
-
-    const dirToAnimClass = (dir) => {
-      switch ((dir || "").toLowerCase()) {
-        case "right": return "animate-from-right";
-        case "top": return "animate-from-top";
-        case "bottom": return "animate-from-bottom";
-        case "left":
-        default: return "animate-from-left";
+      if (reduceMotion) {
+        els.forEach(el => el.classList.add("is-revealed"));
+        return;
       }
+
+      const dirToAnimClass = (dir) => {
+        switch ((dir || "").toLowerCase()) {
+          case "right": return "animate-from-right";
+          case "top": return "animate-from-top";
+          case "bottom": return "animate-from-bottom";
+          case "left":
+          default: return "animate-from-left";
+        }
+      };
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            if (anyOverlayOpen()) return;
+
+            const el = entry.target;
+            const dir = el.getAttribute("data-reveal") || "bottom";
+            const animClass = dirToAnimClass(dir);
+
+            el.classList.add("is-revealed");
+
+            // re-trigger animation cleanly
+            el.classList.remove(...ANIM_CLASSES);
+            void el.offsetWidth;
+            el.classList.add(animClass);
+
+            el.addEventListener(
+              "animationend",
+              () => el.classList.remove(animClass),
+              { once: true }
+            );
+
+            io.unobserve(el);
+            
+          });
+        },
+        {
+          root: null,
+          rootMargin: isMobile ? "0px 0px -5% 0px" : "0px 0px -12% 0px",
+          threshold: isMobile ? 0.06 : 0.12
+        }
+      );
+
+      els.forEach(el => io.observe(el));
     };
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-
-          const el = entry.target;
-          const dir = el.getAttribute("data-reveal") || "bottom";
-          const animClass = dirToAnimClass(dir);
-
-          // ✅ reveal base
-          el.classList.add("is-revealed");
-
-          // ✅ optional: also trigger your keyframe animation once
-          el.classList.remove(...ANIM_CLASSES);
-          void el.offsetWidth;
-          el.classList.add(animClass);
-
-          el.addEventListener(
-            "animationend",
-            () => el.classList.remove(animClass),
-            { once: true }
-          );
-
-          io.unobserve(el);
-        });
-      },
-      {
-        root: null,
-        rootMargin: "0px 0px -12% 0px",
-        threshold: 0.12
-      }
-    );
-
-    filtered.forEach(el => io.observe(el));
-  };
 
   // ---------------------------------------
   // DOM READY / LOAD
