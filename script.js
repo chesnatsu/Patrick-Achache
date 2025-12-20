@@ -151,28 +151,21 @@
   // LOADER + INITIAL SCROLL CONTROL
   // ---------------------------------------
   const hideLoaderAndRevealContent = () => {
-    const loader = qs("#loader");
-    if (!loader || contentRevealed) return;
+    if (contentRevealed) return;
     contentRevealed = true;
 
-    loader.classList.add("fade-out");
+    const loader = qs("#loader");
+    if (loader && !loader.classList.contains("fade-out")) {
+      loader.classList.add("fade-out");
+      setTimeout(() => {
+        loader.style.display = "none";
+      }, 400);
+    }
 
-    setTimeout(() => {
-      loader.style.display = "none";
-
-      // reveal sections
-      revealSectionsInOrder();
-      animateHero();
-
-      // ✅ Wait 2 frames so layout/paint is correct before observing
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          initScrollReveal();
-        });
-      });
-    }, 200);
+    revealSectionsInOrder();
+    animateHero();
   };
-
+  
 
   const unlockScrollAfterAssets = () => {
     if (scrollUnlocked) return;
@@ -1121,99 +1114,7 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'G-95N276228J');
-
   })();
-
-    const initScrollReveal = () => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const els = [...qsa("[data-reveal]")];
-    if (!els.length) return;
-
-    // ✅ Never reveal items inside overlays by default (optional but recommended)
-    const filtered = els.filter(el => !el.closest(ALL_OVERLAYS_SELECTOR));
-
-    // Fallback for older browsers
-    if (!("IntersectionObserver" in window) || reduceMotion) {
-      filtered.forEach(el => el.classList.add("is-revealed"));
-      return;
-    }
-
-    const dirToAnimClass = (dir) => {
-      switch ((dir || "").toLowerCase()) {
-        case "right": return "animate-from-right";
-        case "top": return "animate-from-top";
-        case "bottom": return "animate-from-bottom";
-        case "left":
-        default: return "animate-from-left";
-      }
-    };
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-
-          const el = entry.target;
-          const dir = el.getAttribute("data-reveal") || "bottom";
-          const animClass = dirToAnimClass(dir);
-
-          // ✅ reveal base
-          el.classList.add("is-revealed");
-
-          // ✅ optional: also trigger your keyframe animation once
-          el.classList.remove(...ANIM_CLASSES);
-          void el.offsetWidth;
-          el.classList.add(animClass);
-
-          el.addEventListener(
-            "animationend",
-            () => el.classList.remove(animClass),
-            { once: true }
-          );
-
-          io.unobserve(el);
-        });
-      },
-      {
-        root: null,
-        rootMargin: "0px 0px -12% 0px",
-        threshold: 0.12
-      }
-    );
-
-    filtered.forEach(el => io.observe(el));
-  };
-
-const extractCssUrl = (bgValue) => {
-  // bgValue example: url("...") or none
-  const match = /url\(["']?(.*?)["']?\)/.exec(bgValue || "");
-  return match ? match[1] : "";
-};
-
-const preloadImage = (src) =>
-  new Promise((resolve) => {
-    if (!src) return resolve();
-    const img = new Image();
-    img.onload = resolve;
-    img.onerror = resolve;
-    img.src = src;
-  });
-
-const preloadHeroAssets = () => {
-  const heroBgEl = document.querySelector(".hero-bg");
-  const heroPortrait = document.querySelector(".hero-portrait");
-
-  const bgCss = heroBgEl ? getComputedStyle(heroBgEl).backgroundImage : "";
-  const heroBgSrc = extractCssUrl(bgCss);
-
-  const portraitSrc = heroPortrait?.currentSrc || heroPortrait?.src;
-
-  return Promise.all([
-    preloadImage(heroBgSrc),
-    preloadImage(portraitSrc),
-  ]);
-};
-
 
   // ---------------------------------------
   // DOM READY / LOAD
@@ -1221,6 +1122,8 @@ const preloadHeroAssets = () => {
   doc.addEventListener("DOMContentLoaded", () => {
     body = doc.body;
 
+    emailjs.init("uelTOKuwbo0YX28lb");
+    
     const yearSpan = qs("#year");
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
@@ -1242,21 +1145,9 @@ const preloadHeroAssets = () => {
     initCompaniesCarousel();
     initLightbox();
     initContactForm();
-     // everything can initialize normally here
-  initHistoryOverlayHandling();
-  initNavLinksBehavior();
-  // ... all your init calls ...
 
-  const FAILSAFE_MS = 200;
-
-  Promise.race([
-    preloadHeroAssets(),
-    new Promise((r) => setTimeout(r, FAILSAFE_MS))
-  ]).then(() => {
-    // ✅ keep this
     setTimeout(hideLoaderAndRevealContent, 200);
   });
-});
 
-window.addEventListener("load", unlockScrollAfterAssets);
+  window.addEventListener("load", unlockScrollAfterAssets);
 })();

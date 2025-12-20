@@ -43,43 +43,6 @@
     html::-webkit-scrollbar {
       display: none;       
     }
-    
-   html.page-loading body > *:not(#loader) {
-  visibility: hidden;
-}
-
-html.page-loading #loader {
-  visibility: visible;
-}
-
-/* Prevent white flash */
-html.page-loading,
-body.page-loading {
-  background: #1f1a14;
-}
-
-    /* Scroll reveal base state */
-    [data-reveal] {
-      opacity: 0;
-      transform: translateY(18px);
-      transition: opacity .5s ease, transform .6s ease;
-      will-change: opacity, transform;
-    }
-
-    /* Revealed state */
-    [data-reveal].is-revealed {
-      opacity: 1;
-      transform: none;
-    }
-
-    /* If user prefers reduced motion */
-    @media (prefers-reduced-motion: reduce) {
-      [data-reveal] {
-        opacity: 1 !important;
-        transform: none !important;
-        transition: none !important;
-      }
-    }
 
     #loader {
       position: fixed;
@@ -89,13 +52,34 @@ body.page-loading {
       justify-content: center;
       background: #1f1a14;      
       z-index: 9999;
-      transition: opacity 0.18s ease, visibility 0.18s ease;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
     }
 
     #loader.fade-out {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
+    }
+
+    /* Scroll-reveal base state */
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(14px);
+      will-change: transform, opacity;
+    }
+
+    [data-reveal].is-revealed {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+        animation: none !important;
+      }
     }
 
     /* The spinner circle */
