@@ -14,8 +14,6 @@
       font-family: 'Oxygen', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
       padding-top: var(--navbar-height); 
-      line-height: 1.6;
-      padding-bottom: 85px;
     }
 
     img {
@@ -44,6 +42,16 @@
       display: none;       
     }
 
+    html.reveal-ready [data-reveal] {
+      opacity: 0;
+      transform: translateY(18px);
+      will-change: transform, opacity;
+    }
+
+    html.reveal-ready [data-reveal].is-revealed {
+      opacity: 1;
+      transform: none;
+    }
     #loader {
       position: fixed;
       inset: 0;            
@@ -114,7 +122,6 @@
       top: 0;
       left: 0;
       width: 100%;  
-      padding: 3px;
       background: #ffffff;
       max-width: 100%;
       opacity: 1;
@@ -191,6 +198,29 @@
 
     .sa-overlay-body p.paragraph {
       margin-bottom: 1.5em;
+    }
+
+    /* Scroll reveal base state */
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .5s ease, transform .6s ease;
+      will-change: opacity, transform;
+    }
+
+    /* Revealed state */
+    [data-reveal].is-revealed {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* If user prefers reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
     }
 
     #image-lightbox {
@@ -398,6 +428,9 @@
       .hero-role {
         font-size: .7rem; 
       } 
+      .hero-bg {
+        background-attachment: scroll;
+      }
   }
 
     /* ABOUT VIEW */
@@ -1405,7 +1438,7 @@
 
     .contact {
       position: relative;
-      min-height: 83vh;
+      min-height: 83.5vh;
       display: flex;
       overflow: hidden;
     }
@@ -1608,7 +1641,7 @@
       =========================== */
 
     footer {
-      position: fixed;
+      position: relative;
       left: 0;
       right: 0;
       bottom: 0;
