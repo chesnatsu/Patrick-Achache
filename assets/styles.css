@@ -15,7 +15,6 @@
       margin: 0;
       padding-top: var(--navbar-height); 
       line-height: 1.6;
-      padding-bottom: 85px;
     }
 
     img {
@@ -1607,7 +1606,7 @@
       =========================== */
 
     footer {
-      position: fixed;
+      position: relative;
       left: 0;
       right: 0;
       bottom: 0;
