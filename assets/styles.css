@@ -293,7 +293,6 @@
 
     /* HERO -------------------------------------------------- */
     .hero {
-      position: relative;
       display: flex;
       justify-content: center;
       margin: 0;  

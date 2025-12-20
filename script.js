@@ -1132,7 +1132,7 @@ const preloadImage = (url) =>
     img.onerror = res;
     img.src = url;
   });
-  
+
   // ---------------------------------------
   // DOM READY / LOAD
   // ---------------------------------------
@@ -1172,7 +1172,7 @@ const preloadImage = (url) =>
     preloadImage(heroBgUrl)
   ]),
   // fallback so loader never gets stuck forever
-  new Promise((res) => setTimeout(res, 2500))
+  new Promise((res) => setTimeout(res, 200))
 ]).then(() => {
   hideLoaderAndRevealContent();
 });
