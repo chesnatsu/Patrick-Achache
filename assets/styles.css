@@ -1847,6 +1847,9 @@
       .sa-item img {
         height: 180px;
       }
+      .sa-content {
+        padding: 0 16px 40px;
+      }
     }
 
     /* ---------- COMPANIES ---------- */
