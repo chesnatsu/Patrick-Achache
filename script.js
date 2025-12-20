@@ -1232,18 +1232,10 @@
     initCompaniesCarousel();
     initLightbox();
     initContactForm();
-
-    const FAILSAFE_MS = 2500; 
-
-    Promise.race([
-      preloadHeroAssets(),
-      new Promise((resolve) => setTimeout(resolve, FAILSAFE_MS))
-    ]).then(() => {
-     
-      setTimeout(hideLoaderAndRevealContent, 200);
-    });
-  });
-
+    preloadHeroAssets().
+   
+    setTimeout(hideLoaderAndRevealContent, 200);
+   });
+  
   window.addEventListener("load", unlockScrollAfterAssets);
-
 })();
