@@ -293,6 +293,7 @@
 
     /* HERO -------------------------------------------------- */
     .hero {
+      position: relative;
       display: flex;
       justify-content: center;
       margin: 0;  
@@ -396,6 +397,9 @@
       .hero-role {
         font-size: .7rem; 
       } 
+      .hero-bg {
+        background-attachment: scroll;
+      }
   }
 
     /* ABOUT VIEW */

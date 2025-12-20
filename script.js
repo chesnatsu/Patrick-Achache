@@ -1116,6 +1116,23 @@
     gtag('config', 'G-95N276228J');
   })();
 
+const waitForImgEl = (imgEl) => {
+  if (!imgEl) return Promise.resolve();
+  if (imgEl.complete) return Promise.resolve();
+  return new Promise((res) => {
+    imgEl.addEventListener("load", res, { once: true });
+    imgEl.addEventListener("error", res, { once: true });
+  });
+};
+
+const preloadImage = (url) =>
+  new Promise((res) => {
+    const img = new Image();
+    img.onload = res;
+    img.onerror = res;
+    img.src = url;
+  });
+  
   // ---------------------------------------
   // DOM READY / LOAD
   // ---------------------------------------
@@ -1124,6 +1141,9 @@
 
     emailjs.init("uelTOKuwbo0YX28lb");
     
+    const heroPortrait = document.querySelector("#home .hero-portrait");
+    const heroBgUrl = "images/PA-Images/Website 1.png"; 
+
     const yearSpan = qs("#year");
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
@@ -1146,7 +1166,16 @@
     initLightbox();
     initContactForm();
 
-    setTimeout(hideLoaderAndRevealContent, 200);
+   Promise.race([
+  Promise.all([
+    waitForImgEl(heroPortrait),
+    preloadImage(heroBgUrl)
+  ]),
+  // fallback so loader never gets stuck forever
+  new Promise((res) => setTimeout(res, 2500))
+]).then(() => {
+  hideLoaderAndRevealContent();
+});
   });
 
   window.addEventListener("load", unlockScrollAfterAssets);
