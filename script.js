@@ -1115,15 +1115,15 @@
       gtag('config', 'G-95N276228J');
     })();
 
-    // ---------- SCROLL REVEAL (IntersectionObserver) ----------
-
+    // ---------- 
+    // SCROLL REVEAL (IntersectionObserver) 
+    // ----------
     const initScrollReveal = () => {
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const els = [...qsa("[data-reveal]")];
       const isMobile = window.matchMedia("(max-width: 900px)").matches;
       if (!els.length) return;
 
-      // If user prefers reduced motion, just show everything
       if (reduceMotion) {
         els.forEach(el => {
           el.classList.add("is-revealed");
@@ -1131,10 +1131,8 @@
         return;
       }
 
-      // Ensure base state is applied (in case HTML loads mid-scroll)
       els.forEach(el => {
         if (!el.classList.contains("is-revealed")) {
-          // keep hidden until reveal
         }
       });
 
@@ -1157,24 +1155,21 @@
             const dir = el.getAttribute("data-reveal") || "bottom";
             const animClass = dirToAnimClass(dir);
 
-            // mark revealed
             el.classList.add("is-revealed");
 
-            // trigger your existing keyframe animation safely
             el.classList.remove(...ANIM_CLASSES);
-            void el.offsetWidth; // restart animation
+            void el.offsetWidth; 
             el.classList.add(animClass);
 
             el.addEventListener("animationend", () => el.classList.remove(animClass), { once: true });
 
-            // reveal once (change to false if you want it to re-animate every time)
             io.unobserve(el);
           });
         },
         {
-              root: null,
-              rootMargin: isMobile ? "0px 0px -5% 0px" : "0px 0px -12% 0px",
-              threshold: isMobile ? 0.06 : 0.12
+          root: null,
+          rootMargin: isMobile ? "0px 0px -5% 0px" : "0px 0px -12% 0px",
+          threshold: isMobile ? 0.06 : 0.12
         }
       );
 
@@ -1214,8 +1209,8 @@
     initContactForm();
     initScrollReveal();
 
-      setTimeout(hideLoaderAndRevealContent, 200);
+    setTimeout(hideLoaderAndRevealContent, 200);
     });
-
+    
   window.addEventListener("load", unlockScrollAfterAssets);
 })();
